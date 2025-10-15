@@ -1,5 +1,11 @@
 package com.roberto_sodini.authentication.security.jwt;
 
+import com.roberto_sodini.authentication.enums.AuthProvider;
+import com.roberto_sodini.authentication.security.UserDetailsImpl;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -48,14 +54,14 @@ public class JwtService {
     }
 
     ///  Se viene passato True creo un access token, altrimenti un refresh token
-    public String generateToken(boolean isAccess, UUID userId, String email, Collection<? extends GrantedAuthority> authorities, AuthProvider provider){
+    public String generateToken(boolean isAccess, UserDetailsImpl userDetails){
         Map<String, Object> claims = new HashMap<>();
-        claims.put("authorities", authorities.stream()
+        claims.put("authorities", userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
-        claims.put("sub", userId);
-        claims.put("email", email);
-        claims.put("provider", provider);
+        claims.put("sub", userDetails.getId());
+        claims.put("email", userDetails.getEmail());
+        claims.put("provider", userDetails.getProvider());
 
         if (isAccess){
             return createAccessToken(claims);

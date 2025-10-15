@@ -1,10 +1,15 @@
 ## Autenticazione enterprise
 
 ## Autenticazione utente
+- Dopo la registrazione dell'utente, viene inviata un email al client insieme a un token a breve scadenza (5 minuti)
+- Il client una volta confermata la registrazione verrà inserito nel sistema
+- Se l'autenticazione dell' utente va a buon fine, genero un access token e un refresh token
+- Attraverso kafka invio: - un event per salvare nel db il login dell'utente (login history)
+                          - un event per salvare nel db il refresh token
+- Utilizzo kafka perchè non sono eventi critici che motivano il blocco del login dell'utente
+- Salvo il refresh token in un cookie
+- Invio all'utente l'access token che verrà inviato a ogni richiesta
 
-# Registrazione
-- L'utente si registra con email e password, se non presente viene salvato nel db
-- In caso di successo ritorno una risposta http 201, altrimenti un errore
 
 
 ## Endpoint
