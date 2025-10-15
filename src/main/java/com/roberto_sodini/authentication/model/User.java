@@ -27,6 +27,7 @@ public class User {
     private String email;
 
     @Column(nullable = false)
+    @ToString.Exclude
     private String password;
 
     @ElementCollection(fetch = FetchType.EAGER)
