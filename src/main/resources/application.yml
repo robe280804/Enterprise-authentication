@@ -1,0 +1,24 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: authentication
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/${DB_NAME}?createDatabaseIfNotExist=true
+    username: ${DB_USER}
+    password: ${DB_PASS}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show_sql: true
+    properties:
+      hibernate:
+        format_sql: true

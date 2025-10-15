@@ -22,6 +22,7 @@
 - id 
 - userId (user.id)
 - loginTime (LocalDateTime)
+- loginProvider
 - ipAddress (String) indirizzo ip del client
 - userAgent (String) identifica il browser, device e sistema operativo del client
 - success (boolean)
