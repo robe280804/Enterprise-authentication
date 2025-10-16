@@ -29,6 +29,11 @@ public class GlobalExceptionHandler {
         return generateResponse("TOKEN_EXPIRED", HttpStatus.UNAUTHORIZED, ex, request);
     }
 
+    @ExceptionHandler(RateLimitExceed.class)
+    public ResponseEntity<Object> rateLimitExceed(RateLimitExceed ex, WebRequest request){
+        return generateResponse("RATELIMIT_EXCEED", HttpStatus.TOO_MANY_REQUESTS, ex, request);
+    }
+
 
     private static ResponseEntity<Object> generateResponse(
             String error, HttpStatus status, Exception ex, WebRequest request
