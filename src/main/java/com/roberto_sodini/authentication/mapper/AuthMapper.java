@@ -4,7 +4,9 @@ import com.roberto_sodini.authentication.dto.LoginResponseDto;
 import com.roberto_sodini.authentication.dto.RegisterResponseDto;
 import com.roberto_sodini.authentication.model.User;
 import com.roberto_sodini.authentication.security.UserDetailsImpl;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AuthMapper {
 
     public RegisterResponseDto registerResponseDto(User user){

@@ -9,6 +9,7 @@ import com.roberto_sodini.authentication.exceptions.EmailAlredyRegistered;
 import com.roberto_sodini.authentication.exceptions.EmailNotRegister;
 import com.roberto_sodini.authentication.exceptions.WrongAuthProvider;
 import com.roberto_sodini.authentication.mapper.AuthMapper;
+import com.roberto_sodini.authentication.model.EmailVerificationToken;
 import com.roberto_sodini.authentication.model.User;
 import com.roberto_sodini.authentication.repository.UserRepository;
 import com.roberto_sodini.authentication.security.UserDetailsImpl;
@@ -22,10 +23,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -36,35 +38,61 @@ public class AuthService {
     @Value("${jwt.expiration.refresh_token}")
     private Long longExpiration;
 
+    @Value("${spring.mail.username}")
+    private String emailUsername;
+
     private final UserRepository userRepository;
-    private final PasswordEncoder encoder;
     private final AuthMapper authMapper;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final EmailVerificationTokenService verificationTokenService;
+    private final EmailService emailService;
 
-    public RegisterResponseDto register(@Valid AccessRequestDto request) {
+    /**
+     * <p> Il metodo esegue i seguenti passaggi: </p>
+     * <li>
+     *     <ul> Controllo che l'email non esista nel sistema </ul>
+     *     <ul> Invio un email + token all'utente per confermare la registazione </ul>
+     * </li>
+     * @param request DTO con i dati dell'utente
+     * @return messaggio per confermare l'invio dell'email
+     * @exception EmailAlredyRegistered se l'email è gia registrata
+     */
+    public String register(@Valid AccessRequestDto request) {
         log.info("[REGISTER] Registrazione in esecuzione per {}", request.getEmail());
 
         if (userRepository.existsByEmail(request.getEmail())){
             log.warn("[REGISTER] Registrazione fallita, email {} già presente nel sistema", request.getEmail());
             throw new EmailAlredyRegistered("Email già registrata");
         }
-        /// Genero token per confermare l'email
+        String token = verificationTokenService.createToken(request.getEmail(), request.getPassword());
 
-        /// Invio email all'user per confermare che sia davvero lui
+        Map<String, Object> var = new HashMap<>();
+        var.put("confirmLink", "http://localhost:8080/api/auth/confirm-register?token=" + token);
+
+        emailService.sendHtmlEmail("register_confirm", request.getEmail(), emailUsername, var);
+
+        return "Ti è stata inviata un email per confermare la registrazione";
+    }
+
+    public RegisterResponseDto confirmRegister(String token) {
+        EmailVerificationToken emailVerificationToken = verificationTokenService.verifyToken(token);
 
         User newUser = User.builder()
-                .email(request.getEmail())
-                .password(encoder.encode(request.getPassword()))
+                .email(emailVerificationToken.getUserEmail())
+                .password(emailVerificationToken.getUserPassword())
                 .roles(Set.of(Role.USER))
                 .provider(AuthProvider.LOCALE)
                 .build();
 
         User savedUser = userRepository.save(newUser);
+        log.info("[REGISTER] Registrazione eseguita con successo per {}", newUser.getEmail());
 
-        log.info("[REGISTER] Registrazione avvenuta con successo per {}", savedUser.getEmail());
         return authMapper.registerResponseDto(savedUser);
     }
+
+
+
 
     @Transactional
     public LoginResponseDto login(@Valid AccessRequestDto request) {
@@ -111,4 +139,5 @@ public class AuthService {
         }
         return auth;
     }
+
 }

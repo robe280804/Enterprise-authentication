@@ -7,22 +7,26 @@ import com.roberto_sodini.authentication.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/auth/")
+@RequestMapping("/api/auth/")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponseDto> register(@RequestBody @Valid AccessRequestDto request){
-        return ResponseEntity.status(201).body(authService.register(request));
+    public ResponseEntity<String> register(@RequestBody @Valid AccessRequestDto request){
+        return ResponseEntity.ok(authService.register(request));
     }
+
+    @GetMapping("/confirm-register")
+    public ResponseEntity<RegisterResponseDto> confirmRegister(@RequestParam String token){
+        return ResponseEntity.status(201).body(authService.confirmRegister(token));
+    }
+
+
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid AccessRequestDto request){

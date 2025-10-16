@@ -19,6 +19,16 @@ public class GlobalExceptionHandler {
         return generateResponse("EMAIL_ALREDY_REGISTERED", HttpStatus.CONFLICT, ex, request);
     }
 
+    @ExceptionHandler(TokenNotFound.class)
+    public ResponseEntity<Object> tokenNotFound(TokenNotFound ex, WebRequest request){
+        return generateResponse("TOKEN_NOT_FOUND", HttpStatus.UNAUTHORIZED, ex, request);
+    }
+
+    @ExceptionHandler(TokenExpired.class)
+    public ResponseEntity<Object> tokenExpired(TokenExpired ex, WebRequest request){
+        return generateResponse("TOKEN_EXPIRED", HttpStatus.UNAUTHORIZED, ex, request);
+    }
+
 
     private static ResponseEntity<Object> generateResponse(
             String error, HttpStatus status, Exception ex, WebRequest request

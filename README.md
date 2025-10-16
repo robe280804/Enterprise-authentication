@@ -1,5 +1,14 @@
 ## Autenticazione enterprise
 
+## Flusso Registrazione utente
+- **1** Il client invia email e password validati dal DTO.
+- **2** Controllo che l'email non sia già registrata nel db, nel caso lancio un eccezione.
+- **3** Creo un model Email Verification Token che contiene un token a breve scadenza e i dati dell'utente per la registrazione.
+- **4** Invio l'email all'utente dove è presente un link + token che lo reindirizzerà al server.
+- **5** Il server verifica che il token sia esistente e non sia scaduto, se scaduto la registrazione non viene eseguita.
+- **6** Creo il nuovo utente e lo salvo nel database, ottenendo i suoi dati dal modello salvato nel db.
+- Tutti gli eventi importanti (creazione token, invio email, conferma registrazione, errori) sono loggati in modo strutturato.
+
 ## Autenticazione utente
 - Dopo la registrazione dell'utente, viene inviata un email al client insieme a un token a breve scadenza (5 minuti)
 - Il client una volta confermata la registrazione verrà inserito nel sistema
@@ -26,6 +35,15 @@
 - **authProvider **
 - **createdAt** (LocalDateTime)
 - **updatedAt** (LocalDateTime)
+
+# Email verification token
+- *id**
+- **userEmail** (String) 
+- **userPassword** (String) password hashata 
+- **token** (String) a breve scadenza
+- **expiryDate** (LocalDateTime) 5 minuti dopo la creazione
+- **revoked** (Boolean) 
+- **registerSuccess** (Boolean) 
 
 # Refresh token
 - **id**
