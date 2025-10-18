@@ -1,4 +1,4 @@
-## Autenticazione enterprise
+# Autenticazione enterprise
 
 ## Flusso Registrazione utente
 -  Il client invia email e password validati dal DTO.
@@ -10,8 +10,6 @@
 - Tutti gli eventi importanti (creazione token, invio email, conferma registrazione, errori) sono loggati in modo strutturato.
 
 ## Autenticazione utente
-- Dopo la registrazione dell'utente, viene inviata un email al client insieme a un token a breve scadenza (5 minuti)
-- Il client una volta confermata la registrazione verrà inserito nel sistema
 - Se l'autenticazione dell' utente va a buon fine, genero un access token e un refresh token
 - Attraverso kafka invio: - un event per salvare nel db il login dell'utente (login history)
                           - un event per salvare nel db il refresh token
@@ -20,9 +18,9 @@
 - Invio all'utente l'access token che verrà inviato a ogni richiesta
 
 
-## Security 
+# Security 
 
-# Rate liming
+## Rate liming
 **Limito il numero di chiamate che il client può fare a un endpoint, proteggendo il sistema da attacchi DoS**
 - Annotazione personalizzata RateLimit da usare sopra i metodi del controller, accetta il limite di richieste e il varco temporale
 - Aggiungo della logica all'annotazione attraverso il RedisLimitAspect dove ottengo l'ip dell'utente e altri dati del metodo su cui 
@@ -47,12 +45,12 @@ CAP on account‑creation throughput (per evitare account farming)
 
 ## Endpoint
 
-- api/auth/register | (POST) | (ROLE: ANY) | Metodo per la registrazione e invio email per la conferma
-- api/auth/confirm-register | (GET) |(ROLE: ANY) | Metodo per confermare la registrazione
+- **api/auth/register** | (POST) | (ROLE: ANY) | Metodo per la registrazione e invio email per la conferma
+- **api/auth/confirm-register** | (GET) |(ROLE: ANY) | Metodo per confermare la registrazione
 
-## Modelli database
+# Modelli database
 
-# User
+## User
 - **id**
 - **email** (String)
 - **password** (String)
@@ -61,7 +59,7 @@ CAP on account‑creation throughput (per evitare account farming)
 - **createdAt** (LocalDateTime)
 - **updatedAt** (LocalDateTime)
 
-# Email verification token
+## Email verification token
 - *id**
 - **userEmail** (String) 
 - **userPassword** (String) password hashata 
@@ -70,16 +68,16 @@ CAP on account‑creation throughput (per evitare account farming)
 - **revoked** (Boolean) 
 - **registerSuccess** (Boolean) 
 
-# Refresh token
+## Refresh token
 - **id**
-- **userId** (user.id)
+- **user** (user.id)
 - **refreshToken** (String)
 - **expiryDate** (LocalDateTime)
 - **revoked** (boolean)
 
-# Login history
+## Login history
 - **id**
-- **userId** (user.id)
+- **user** (user.id)
 - **loginTime** (LocalDateTime)
 - **loginProvider**
 - **ipAddress** (String) indirizzo ip del client
@@ -87,7 +85,7 @@ CAP on account‑creation throughput (per evitare account farming)
 - **success** (boolean)
 - **failureReason** (String) in caso di success=false
 
-# Reset password
+## Reset password
 - **id**
 - **userId** (user.id)
 - **token** (String)

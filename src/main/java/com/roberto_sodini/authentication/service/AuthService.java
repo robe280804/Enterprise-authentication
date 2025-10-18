@@ -10,11 +10,12 @@ import com.roberto_sodini.authentication.exceptions.EmailNotRegister;
 import com.roberto_sodini.authentication.exceptions.WrongAuthProvider;
 import com.roberto_sodini.authentication.mapper.AuthMapper;
 import com.roberto_sodini.authentication.model.EmailVerificationToken;
+import com.roberto_sodini.authentication.model.LoginHistory;
 import com.roberto_sodini.authentication.model.User;
 import com.roberto_sodini.authentication.repository.UserRepository;
 import com.roberto_sodini.authentication.security.UserDetailsImpl;
 import com.roberto_sodini.authentication.security.jwt.JwtService;
-import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -44,9 +46,11 @@ public class AuthService {
     private final UserRepository userRepository;
     private final AuthMapper authMapper;
     private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
     private final EmailVerificationTokenService verificationTokenService;
     private final EmailService emailService;
+    private final JwtService jwtService;
+
 
     /**
      * <p> Il metodo esegue i seguenti passaggi: </p>
@@ -93,35 +97,54 @@ public class AuthService {
 
 
 
-
     @Transactional
-    public LoginResponseDto login(@Valid AccessRequestDto request) {
+    public LoginResponseDto login(@Valid AccessRequestDto request, HttpServletRequest servletRequest) {
         log.info("[LOGIN] Login in esecuzione per {}", request.getEmail());
+
+        String userIp = servletRequest.getRemoteAddr();
+        String userAgent = servletRequest.getHeader("User-agent");
+
+        log.info("User ip {} e User agent {}", userIp,  userAgent);
+
+        LoginHistory loginHistory = LoginHistory.builder()
+                .ipAddress(userIp)
+                .userAgent(userAgent)
+                .loginTime(LocalDateTime.now())
+                .loginProvider(AuthProvider.LOCALE)
+                .build();
+
 
         if (!userRepository.existsByEmail(request.getEmail())){
             log.warn("[LOGIN] Login fallito, email {} non presente nel sistema", request.getEmail());
+            loginHistory.setSuccess(false);
+            loginHistory.setFailureReason("Email non registrata");
+
+            // Invio a kafka per il salvataggio
             throw new EmailNotRegister("Email non registrata");
         }
 
+        // Autenticazione utente
         Authentication auth = userAuth(request);
         UserDetailsImpl userDetails = (UserDetailsImpl) auth.getPrincipal();
 
         if (!userDetails.getProvider().equals(AuthProvider.LOCALE)){
             log.warn("[LOGIN] Fallito per email {}, accesso già eseguito con {}", request.getEmail(), userDetails.getProvider());
+            loginHistory.setSuccess(false);
+            loginHistory.setFailureReason("Provider errato");
+
+            // Invio a kafka per il salvataggio
             throw new WrongAuthProvider("Errore, esegui l'accesso attraverso il provider con cui ti sei registrato");
         }
 
         String accessToken = jwtService.generateToken(true, userDetails);
-        String refreshToken = jwtService.generateToken(false, userDetails);
 
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);  //js non può leggerlo
-        //refreshTokenCookie.setSecure(true);  solo HTTPS
-        refreshTokenCookie.setPath("/api/auth/refresh");
-        refreshTokenCookie.setMaxAge(Math.toIntExact(longExpiration));
+        // Generamento e salvataggio nel db del refresh-token
+        String refreshToken = refreshTokenService.create(userDetails.getEmail());
 
+        // Chiamata kafka per generare un login history
+        //loginHistory.setSuccess(true);
+        //loginHistory.setUser(userDetails);
         return authMapper.loginResponseDto(userDetails, accessToken);
-
     }
 
 

@@ -5,6 +5,7 @@ import com.roberto_sodini.authentication.dto.LoginResponseDto;
 import com.roberto_sodini.authentication.dto.RegisterResponseDto;
 import com.roberto_sodini.authentication.security.ratelimiter.RateLimit;
 import com.roberto_sodini.authentication.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,10 +28,12 @@ public class AuthController {
     public ResponseEntity<RegisterResponseDto> confirmRegister(@RequestParam String token){
         return ResponseEntity.status(201).body(authService.confirmRegister(token));
     }
-    
+
+
+
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid AccessRequestDto request){
-        return ResponseEntity.ok(authService.login(request));
+    public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid AccessRequestDto request, HttpServletRequest servletRequest){
+        return ResponseEntity.ok(authService.login(request, servletRequest));
     }
 }

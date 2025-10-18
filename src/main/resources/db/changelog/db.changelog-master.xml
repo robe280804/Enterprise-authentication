@@ -13,6 +13,12 @@
         </addColumn>
     </changeSet>
 
+    
+    <changeSet id="20231016-2-alter-refresh-token-column" author="Roberto Sodini">
+        <modifyDataType tableName="refresh_token" columnName="refresh_token" newDataType="VARCHAR(1024)" />
+    </changeSet>
+
+
     <!--
       Questo file servirà come punto d’ingresso per tutte le future migrazioni.
       Ogni volta che creo nuove tabelle o alterazioni, aggiungi un nuovo <changeSet>.

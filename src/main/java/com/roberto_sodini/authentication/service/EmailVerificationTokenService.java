@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,6 +35,7 @@ public class EmailVerificationTokenService {
      * @param password dell'utente
      * @return token
      */
+    @Transactional
     public String createToken(String userEmail, String password){
         log.info("[EMAIL VERIFICATION TOKEN] Creazione del token per l'utente {}", userEmail);
 
@@ -41,7 +43,7 @@ public class EmailVerificationTokenService {
         String hashToken = DigestUtils.sha3_256Hex(token);
         String hashPassword = encoder.encode(password);
 
-        List<EmailVerificationToken> userTokens = emailVerificationTokenRepository.findAll();
+        List<EmailVerificationToken> userTokens = emailVerificationTokenRepository.findAllByUserEmail(userEmail);
 
         if (!userTokens.isEmpty()){
             userTokens.forEach(tkn -> {
