@@ -9,13 +9,13 @@
 -  Creo il nuovo utente e lo salvo nel database, ottenendo i suoi dati dal modello salvato nel db.
 - Tutti gli eventi importanti (creazione token, invio email, conferma registrazione, errori) sono loggati in modo strutturato.
 
-## Autenticazione utente
-- Se l'autenticazione dell' utente va a buon fine, genero un access token e un refresh token
-- Attraverso kafka invio: - un event per salvare nel db il login dell'utente (login history)
-                          - un event per salvare nel db il refresh token
-- Utilizzo kafka perchè non sono eventi critici che motivano il blocco del login dell'utente
-- Salvo il refresh token in un cookie
-- Invio all'utente l'access token che verrà inviato a ogni richiesta
+## Flusso Login utente
+- Il client invia le credenziali email e password
+- Creo un Login History per tener traccia del tentativo di login, a ogni eccezione lo imposto come non eseguito e 
+  inserisco un failure reason, poi lo invio in modo async al producer kafka che lo salverà nel db
+- Se l'autenticazione procede correttamente, genero un refresh-token che salvo nel db, impostando tutti i refresh-token precedenti come revoked,
+  in questo modo evito conflitti nell'avere più token sempre validi
+- Invio il login history con success=true a kafka e ritorno all'utente un DTO con l'access token e alcuni dati di accesso
 
 
 # Security 

@@ -29,9 +29,7 @@ public class AuthController {
         return ResponseEntity.status(201).body(authService.confirmRegister(token));
     }
 
-
-
-
+    @RateLimit(limit = 5, timesWindowSecond = 60)
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid AccessRequestDto request, HttpServletRequest servletRequest){
         return ResponseEntity.ok(authService.login(request, servletRequest));

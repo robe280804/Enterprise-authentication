@@ -3,6 +3,7 @@ package com.roberto_sodini.authentication.model;
 import com.roberto_sodini.authentication.enums.AuthProvider;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,9 +23,8 @@ public class LoginHistory {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_email", nullable = false)
+    private String userEmail;
 
     @Column(name = "login_time", nullable = false)
     private LocalDateTime loginTime;
@@ -42,6 +42,5 @@ public class LoginHistory {
     private boolean success;
 
     @Column(name = "failure_reason")
-    @Max(value = 50)
     private String failureReason;
 }

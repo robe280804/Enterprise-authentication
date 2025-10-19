@@ -43,10 +43,9 @@ public class RefreshTokenService {
         List<RefreshToken> userTokens = refreshTokenRepository.findAllByUser(user);
 
         if (!userTokens.isEmpty()){
-            userTokens.forEach(tkn -> {
-                tkn.setRevoked(true);
-                refreshTokenRepository.save(tkn);
-            });
+            userTokens.forEach(tkn ->
+                tkn.setRevoked(true));
+            refreshTokenRepository.saveAll(userTokens);
         }
 
         RefreshToken refreshToken = RefreshToken.builder()

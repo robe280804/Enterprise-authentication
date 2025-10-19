@@ -1,6 +1,7 @@
 package com.roberto_sodini.authentication.service;
 
 import com.roberto_sodini.authentication.dto.AccessRequestDto;
+import com.roberto_sodini.authentication.dto.LoginHistoryDto;
 import com.roberto_sodini.authentication.dto.LoginResponseDto;
 import com.roberto_sodini.authentication.dto.RegisterResponseDto;
 import com.roberto_sodini.authentication.enums.AuthProvider;
@@ -10,8 +11,8 @@ import com.roberto_sodini.authentication.exceptions.EmailNotRegister;
 import com.roberto_sodini.authentication.exceptions.WrongAuthProvider;
 import com.roberto_sodini.authentication.mapper.AuthMapper;
 import com.roberto_sodini.authentication.model.EmailVerificationToken;
-import com.roberto_sodini.authentication.model.LoginHistory;
 import com.roberto_sodini.authentication.model.User;
+import com.roberto_sodini.authentication.producer.LoginHistoryProducer;
 import com.roberto_sodini.authentication.repository.UserRepository;
 import com.roberto_sodini.authentication.security.UserDetailsImpl;
 import com.roberto_sodini.authentication.security.jwt.JwtService;
@@ -20,6 +21,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -50,6 +52,7 @@ public class AuthService {
     private final EmailVerificationTokenService verificationTokenService;
     private final EmailService emailService;
     private final JwtService jwtService;
+    private final LoginHistoryProducer loginHistoryProducer;
 
 
     /**
@@ -96,7 +99,22 @@ public class AuthService {
     }
 
 
-
+    /**
+     * <p> Il metodo esegue i seguenti step: </p>
+     * <ul>
+     *     <li> Ottengo l'indirizzo ip e l' agent user del client </li>
+     *     <li> Creo un DTO login history che terrà traccia dei tentativi di login </li>
+     *     <li> Controllo che l'utente sia registrato, se non lo è imposto il login history come non eseguito e lo invio a kafka </li>
+     *     <li> Autentico l'utente attraverso authentication manager </li>
+     *     <li> Controllo che il provider di accesso sia locale, altrimenti imposto il login history come non eseguito e lo invio a kafka </li>
+     *     <li> Genero access token e refresh token, il quale salverò nel db (solo il refresh) </li>
+     *     <li> Imposto il login history come eseguito e lo invio a kafka </li>
+     *     <li> Ritorno un DTO con i dati dell'utente e l'access token </li>
+     * </ul>
+     * @param request DTO con email e password
+     * @param servletRequest per accedere ai dati del client
+     * @return DTO con i dati di accesso
+     */
     @Transactional
     public LoginResponseDto login(@Valid AccessRequestDto request, HttpServletRequest servletRequest) {
         log.info("[LOGIN] Login in esecuzione per {}", request.getEmail());
@@ -104,10 +122,9 @@ public class AuthService {
         String userIp = servletRequest.getRemoteAddr();
         String userAgent = servletRequest.getHeader("User-agent");
 
-        log.info("User ip {} e User agent {}", userIp,  userAgent);
-
-        LoginHistory loginHistory = LoginHistory.builder()
+        LoginHistoryDto loginHistoryDto = LoginHistoryDto.builder()
                 .ipAddress(userIp)
+                .userEmail(request.getEmail())
                 .userAgent(userAgent)
                 .loginTime(LocalDateTime.now())
                 .loginProvider(AuthProvider.LOCALE)
@@ -116,23 +133,25 @@ public class AuthService {
 
         if (!userRepository.existsByEmail(request.getEmail())){
             log.warn("[LOGIN] Login fallito, email {} non presente nel sistema", request.getEmail());
-            loginHistory.setSuccess(false);
-            loginHistory.setFailureReason("Email non registrata");
+            loginHistoryDto.setSuccess(false);
+            loginHistoryDto.setFailureReason("Email non registrata");
 
             // Invio a kafka per il salvataggio
+            sendLoginHistory(loginHistoryDto);
             throw new EmailNotRegister("Email non registrata");
         }
 
         // Autenticazione utente
-        Authentication auth = userAuth(request);
+        Authentication auth = userAuth(request, loginHistoryDto);
         UserDetailsImpl userDetails = (UserDetailsImpl) auth.getPrincipal();
 
         if (!userDetails.getProvider().equals(AuthProvider.LOCALE)){
             log.warn("[LOGIN] Fallito per email {}, accesso già eseguito con {}", request.getEmail(), userDetails.getProvider());
-            loginHistory.setSuccess(false);
-            loginHistory.setFailureReason("Provider errato");
+            loginHistoryDto.setSuccess(false);
+            loginHistoryDto.setFailureReason("Provider errato");
 
             // Invio a kafka per il salvataggio
+            sendLoginHistory(loginHistoryDto);
             throw new WrongAuthProvider("Errore, esegui l'accesso attraverso il provider con cui ti sei registrato");
         }
 
@@ -142,13 +161,14 @@ public class AuthService {
         String refreshToken = refreshTokenService.create(userDetails.getEmail());
 
         // Chiamata kafka per generare un login history
-        //loginHistory.setSuccess(true);
-        //loginHistory.setUser(userDetails);
+        loginHistoryDto.setSuccess(true);
+        sendLoginHistory(loginHistoryDto);
+
         return authMapper.loginResponseDto(userDetails, accessToken);
     }
 
 
-    private Authentication userAuth(AccessRequestDto request){
+    private Authentication userAuth(AccessRequestDto request, LoginHistoryDto loginHistoryDto){
         Authentication auth;
         try {
             auth = authenticationManager.authenticate(
@@ -157,10 +177,21 @@ public class AuthService {
                     )
             );
         } catch (BadCredentialsException ex) {
+            loginHistoryDto.setSuccess(false);
+            loginHistoryDto.setFailureReason("Credenziali errate");
+            sendLoginHistory(loginHistoryDto);
+
             log.warn("[LOGIN] Fallito per email {}: {}", request.getEmail(), ex.getMessage());
             throw ex;
         }
         return auth;
+    }
+
+    // Non chiamo subito il producer kafka nel metodo di login, altrimenti sarebbe dipendente dall'invio.
+    // In questo la chiamata a producer non influenza il metodo di login con @Async
+    @Async
+    private void sendLoginHistory(LoginHistoryDto loginHistoryDto){
+        loginHistoryProducer.sendLoginHistory(loginHistoryDto);
     }
 
 }
