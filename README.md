@@ -20,28 +20,24 @@
 
 # Security 
 
-## Rate liming
+## Rate liming e Lockout progressive
 **Limito il numero di chiamate che il client può fare a un endpoint, proteggendo il sistema da attacchi DoS**
 - Annotazione personalizzata RateLimit da usare sopra i metodi del controller, accetta il limite di richieste e il varco temporale
 - Aggiungo della logica all'annotazione attraverso il RedisLimitAspect dove ottengo l'ip dell'utente e altri dati del metodo su cui 
     viene usata l'annotazione.
 - Utilizzo il RedisRateLimiter per tenere traccia dei tentativi
+- Implementato al suo interno un progressive lockout che, dopo tot tentativi falliti blocca l'utente per un tempo
 
 
 # Implementazioni della sicurezza future
 CAPTCHA / reCAPTCHA (step up dopo N tentativi o sempre su registrazione)
 Throttling per email (resend) e cooldown (es. 3 resi/ora)
-Lockout progressive / exponential backoff (progressive delay su tentativi ripetuti)
 Honeypot/hidden field per bot semplici
-Password policy & hashing forte (BCrypt/Argon2, min length, checks)
-Email normalization & uniqueness check (normalizza prima di check duplicati)
 Token protections (hash token, breve expiry, single‑use) — già veduto
 IP reputation / blocklist / WAF (Cloud WAF, fail2ban, Cloudflare)
 Logging strutturato, metriche e alerting (Prometheus/Grafana, alert su spike)
 Async logging/audit (Kafka) con retries e DLQ) — non blocca flusso principale
 Device fingerprinting / rate per device (opzionale per alto rischio)
-MFA & verification step (se vuoi aumentare la sicurezza)
-CAP on account‑creation throughput (per evitare account farming)
 
 ## Endpoint
 
@@ -87,7 +83,13 @@ CAP on account‑creation throughput (per evitare account farming)
 
 ## Reset password
 - **id**
-- **userId** (user.id)
+- **user** (user.id)
 - **token** (String)
 - **expiryDate** (LocalDateTime)
-- **used** (boolean)
+- **revoked** (Boolean)
+- **resetSuccess** (Boolean)
+
+
+# Redis
+Redis è un database in-memory che permette di conservare in dati in memoria RAM, rendendolo molto più veloce rispetto a MySQL...
+

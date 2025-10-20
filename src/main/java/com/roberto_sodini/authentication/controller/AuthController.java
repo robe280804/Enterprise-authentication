@@ -1,6 +1,7 @@
 package com.roberto_sodini.authentication.controller;
 
 import com.roberto_sodini.authentication.dto.AccessRequestDto;
+import com.roberto_sodini.authentication.dto.EmailDto;
 import com.roberto_sodini.authentication.dto.LoginResponseDto;
 import com.roberto_sodini.authentication.dto.RegisterResponseDto;
 import com.roberto_sodini.authentication.security.ratelimiter.RateLimit;
@@ -33,5 +34,15 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid AccessRequestDto request, HttpServletRequest servletRequest){
         return ResponseEntity.ok(authService.login(request, servletRequest));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody @Valid EmailDto email){
+        return ResponseEntity.ok(authService.resetPassword(email));
+    }
+
+    @PostMapping("/confirm-reset-password")
+    public ResponseEntity<String> confirmResetPassword(){
+        return ResponseEntity.ok();
     }
 }

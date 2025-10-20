@@ -3,10 +3,12 @@ package com.roberto_sodini.authentication.security.ratelimiter;
 import com.roberto_sodini.authentication.exceptions.RateLimitExceed;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -16,10 +18,12 @@ import java.lang.reflect.Method;
 @Aspect
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class RateLimitAspect {
 
     private final RedisRateLimiter redisRateLimiter;
     private final HttpServletRequest httpServletRequest;
+    private final StringRedisTemplate stringRedisTemplate;
 
     /**
      * <p> Il metodo esegue i seguenti step: </p>
@@ -43,10 +47,15 @@ public class RateLimitAspect {
 
         String clientIp = httpServletRequest.getRemoteAddr();
         String key = "ratelimit:" + clientIp + "method:" + method.getName();
+        String levelKey = "rl:" + key + ":level";
 
         boolean allowed = redisRateLimiter.isAllowed(key, rateLimit.limit(), rateLimit.timesWindowSecond());
 
-        if (!allowed) throw new RateLimitExceed("Troppe richieste, riprova più tardi");
+        if (!allowed) {
+            Long time = stringRedisTemplate.getExpire(levelKey);
+            log.warn("[RATE LIMITER] Utente {} bloccato per {} secondi", clientIp, time);
+            throw new RateLimitExceed("Troppe richieste, riprova tra " + time + " secondi");
+        }
 
         return  joinPoint.proceed();
     }

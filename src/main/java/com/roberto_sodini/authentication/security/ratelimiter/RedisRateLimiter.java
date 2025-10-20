@@ -19,31 +19,71 @@ public class RedisRateLimiter {
     /**
      * <p> Il metodo esegue i seguenti step: </p>
      * <ul>
-     *     <li> Incremento un contatore in redis associato alla key passata (ogni volta che verrà chiamato il metodo) </li>
+     *     <li> Creo tre chiavi, una per il contatore e una per il livello di blocco persistente e una che ha il tempo del blocco </li>
+     *     <li> Ottengo il valore memorizzato per la chiave block-key, se null la inizializzo a 0 altrimenti prende il valore </li>
+     *     <li> Controllo se la chiave level-key è scaduta, altrimenti l'utente è ancora bloccato </li>
+     *     <li> Incremento un contatore in redis associato alla count-key </li>
      *     <li> Se count = null, redis non lo avrà inizializzato correttamente e ritorno false</li>
      *     <li> Se è la prima chiamata, si imposta un tempo di scadenza </li>
-     *     <li> Una volta che il tempo scade, Redis eliminà la chiave e imposta il contatore a 0 </li>
-     *     <li> Ritorna true se il contatore è <= del limite, altrimenti false </li>
+     *     <li> Se il count è > del limit, incremento il block-level e salvo il suo valore riferito alla chiave block-key </li>
+     *     <li> Definisco per ogni livello di blocco un tempo in secondi in cui l'utente non potrà eseguire quella richiesta </li>
+     *     <li> Definisco l' expiration della chiave come il tempo del livello di blocco ed elimino quella del contatore </li>
      * </ul>
+     *
      * @param key identificatore dell'utente
      * @param limit limite delle richieste
      * @param timesWindowSecond durata della finestra temporale
-     * @return true se il contatore è minore del limite, false se maggiore
-     * @exception DataAccessException per errori dovuti da redis
+     * @return true se il contatore è minore del limite e non sono presenti block level,
+     *         false se sono presentii block level, se il contatore non viene inizializzato e se il contatore > limite
+     * @throws DataAccessException per errori dovuti da redis
      */
-    public boolean isAllowed(String key, int limit, int timesWindowSecond){
+    public boolean isAllowed(String key, int limit, int timesWindowSecond) {
         try {
-            Long count = stringRedisTemplate.opsForValue().increment(key);
+            String countKey = "rl:" + key + ":count";   // Chiave per il contatore
+            String levelKey = "rl:" + key + ":level";   // Chiave per il livello di blocco non persistente
+            String blockKey = "rl:" + key + ":block";   // Chiave per il livello di blocco persistente
+
+            String blockValue = stringRedisTemplate.opsForValue().get(blockKey);
+            int blockLevel = (blockValue == null) ? 0 : Integer.parseInt(blockValue);
+
+
+            // Se l'utente ha già un blocco e non è ancora scaduto ritorna false
+            Long remainingBlockTime = stringRedisTemplate.getExpire(levelKey);
+            if (remainingBlockTime > 0) {
+               return false;
+            }
+
+            Long count = stringRedisTemplate.opsForValue().increment(countKey);
 
             if (Objects.isNull(count)) return false;
 
+            // Imposto expire contatore alla prima richiesta
             if (count == 1) {
                 stringRedisTemplate.expire(key, Duration.ofSeconds(timesWindowSecond));
             }
 
-            return count <= limit;
+            if (count > limit) {
+                // Incremento il livello di blocco
+                blockLevel++;
 
-        } catch (DataAccessException ex){
+                long blockSecond;
+                switch (blockLevel) {
+                    case 1 -> blockSecond = 60;   // 1 minuto
+                    case 2 -> blockSecond = 120;  // 2 minuti
+                    case 3 -> blockSecond = 300;  // 5 minuti
+                    default -> blockSecond = 600; // 10 minuti
+                }
+
+                // Imposto la scadenza della chiave riferente al livello di blocco
+                stringRedisTemplate.opsForValue().set(blockKey, String.valueOf(blockLevel), Duration.ofMinutes(10));  // Ogni 10 minuti si resetta
+                stringRedisTemplate.opsForValue().set(levelKey, "blocked", Duration.ofSeconds(blockSecond));
+                stringRedisTemplate.delete(countKey);
+
+                return false;
+            }
+            return true;
+
+        } catch (DataAccessException ex) {
             log.error("[REDIS RATE LIMITER] Impossibile valutare il rate limiter", ex);
             return false;
         }

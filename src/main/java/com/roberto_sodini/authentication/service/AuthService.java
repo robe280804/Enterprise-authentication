@@ -1,9 +1,6 @@
 package com.roberto_sodini.authentication.service;
 
-import com.roberto_sodini.authentication.dto.AccessRequestDto;
-import com.roberto_sodini.authentication.dto.LoginHistoryDto;
-import com.roberto_sodini.authentication.dto.LoginResponseDto;
-import com.roberto_sodini.authentication.dto.RegisterResponseDto;
+import com.roberto_sodini.authentication.dto.*;
 import com.roberto_sodini.authentication.enums.AuthProvider;
 import com.roberto_sodini.authentication.enums.Role;
 import com.roberto_sodini.authentication.exceptions.EmailAlredyRegistered;
@@ -194,4 +191,12 @@ public class AuthService {
         loginHistoryProducer.sendLoginHistory(loginHistoryDto);
     }
 
+    public String resetPassword(@Valid EmailDto email) {
+        log.info("[RESET PASSWORD] Utente {} sta cercando di cambiare la password", email.getEmail());
+
+        User user = userRepository.findByEmail(email.getEmail())
+                .orElseThrow(() -> new EmailNotRegister("Utente non trovato"));
+
+        String token = resetPassword.create(user);
+    }
 }
