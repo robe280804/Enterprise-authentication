@@ -32,17 +32,19 @@
 # Implementazioni della sicurezza future
 CAPTCHA / reCAPTCHA (step up dopo N tentativi o sempre su registrazione)
 Throttling per email (resend) e cooldown (es. 3 resi/ora)
-Honeypot/hidden field per bot semplici
-Token protections (hash token, breve expiry, single‑use) — già veduto
 IP reputation / blocklist / WAF (Cloud WAF, fail2ban, Cloudflare)
 Logging strutturato, metriche e alerting (Prometheus/Grafana, alert su spike)
 Async logging/audit (Kafka) con retries e DLQ) — non blocca flusso principale
-Device fingerprinting / rate per device (opzionale per alto rischio)
 
 ## Endpoint
 
-- **api/auth/register** | (POST) | (ROLE: ANY) | Metodo per la registrazione e invio email per la conferma
-- **api/auth/confirm-register** | (GET) |(ROLE: ANY) | Metodo per confermare la registrazione
+- **api/auth/register** | POST | ROLE: ANY | Metodo per la registrazione e invio email per la conferma
+- **api/auth/confirm-register** | GET | ROLE: ANY | Metodo per confermare la registrazione
+- **api/auth/login** | POST | ROLE:ANY | Metodo per il login
+- **api/auth/logout** | POST | ROLE:USER, ADMIN | Metodo per il logout
+
+- **api/password/reset/** | POST | ROLE:ANY | Metodo per richiedere il reset password
+- **api/password/reset-confirm/** | POST | ROLE:ANY | Metodo per confermare il reset password
 
 # Modelli database
 

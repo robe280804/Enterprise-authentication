@@ -32,5 +32,4 @@ public class ResetPassword {
 
     @Column(nullable = false)
     private Boolean revoked;
-
 }

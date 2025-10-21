@@ -6,6 +6,7 @@ import com.roberto_sodini.authentication.dto.LoginResponseDto;
 import com.roberto_sodini.authentication.dto.RegisterResponseDto;
 import com.roberto_sodini.authentication.security.ratelimiter.RateLimit;
 import com.roberto_sodini.authentication.service.AuthService;
+import com.roberto_sodini.authentication.service.ResetPasswordService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +14,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth/")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
     private final AuthService authService;
+    private final ResetPasswordService resetPasswordService;
 
     @RateLimit(limit = 5, timesWindowSecond = 60)
     @PostMapping("/register")
@@ -36,13 +38,8 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request, servletRequest));
     }
 
-    @PostMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestBody @Valid EmailDto email){
-        return ResponseEntity.ok(authService.resetPassword(email));
-    }
-
-    @PostMapping("/confirm-reset-password")
-    public ResponseEntity<String> confirmResetPassword(){
-        return ResponseEntity.ok();
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(){
+        return ResponseEntity.ok(authService.logout());
     }
 }

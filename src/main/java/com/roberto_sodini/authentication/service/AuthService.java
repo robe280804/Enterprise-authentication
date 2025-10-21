@@ -8,8 +8,10 @@ import com.roberto_sodini.authentication.exceptions.EmailNotRegister;
 import com.roberto_sodini.authentication.exceptions.WrongAuthProvider;
 import com.roberto_sodini.authentication.mapper.AuthMapper;
 import com.roberto_sodini.authentication.model.EmailVerificationToken;
+import com.roberto_sodini.authentication.model.RefreshToken;
 import com.roberto_sodini.authentication.model.User;
 import com.roberto_sodini.authentication.producer.LoginHistoryProducer;
+import com.roberto_sodini.authentication.repository.RefreshTokenRepository;
 import com.roberto_sodini.authentication.repository.UserRepository;
 import com.roberto_sodini.authentication.security.UserDetailsImpl;
 import com.roberto_sodini.authentication.security.jwt.JwtService;
@@ -23,11 +25,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,7 +54,7 @@ public class AuthService {
     private final EmailService emailService;
     private final JwtService jwtService;
     private final LoginHistoryProducer loginHistoryProducer;
-
+    private final RefreshTokenRepository refreshTokenRepository;
 
     /**
      * <p> Il metodo esegue i seguenti passaggi: </p>
@@ -191,12 +195,17 @@ public class AuthService {
         loginHistoryProducer.sendLoginHistory(loginHistoryDto);
     }
 
-    public String resetPassword(@Valid EmailDto email) {
-        log.info("[RESET PASSWORD] Utente {} sta cercando di cambiare la password", email.getEmail());
+    public String logout() {
+       User user = (User) SecurityContextHolder.getContext().getAuthentication();
+        log.info("[LOGOUT] Logout in esecuzione per {}", user.getEmail());
 
-        User user = userRepository.findByEmail(email.getEmail())
-                .orElseThrow(() -> new EmailNotRegister("Utente non trovato"));
+        List<RefreshToken> userTokens = refreshTokenRepository.findAllByUserAndNonRevoked(user);
+        userTokens.forEach(tkn -> tkn.setRevoked(true));
+        refreshTokenRepository.saveAll(userTokens);
 
-        String token = resetPassword.create(user);
+        SecurityContextHolder.clearContext();
+
+        log.info("[LOGOUT] Logout eseguito con successo");
+        return "Logout eseguito con successo";
     }
 }

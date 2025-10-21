@@ -43,15 +43,8 @@ public class EmailVerificationTokenService {
         String hashToken = DigestUtils.sha3_256Hex(token);
         String hashPassword = encoder.encode(password);
 
-        List<EmailVerificationToken> userTokens = emailVerificationTokenRepository.findAllByUserEmail(userEmail);
-
-        if (!userTokens.isEmpty()){
-            userTokens.forEach(tkn -> {
-                tkn.setRevoked(true);
-                emailVerificationTokenRepository.save(tkn);
-            });
-
-        }
+        // Query per evitare N+1
+        emailVerificationTokenRepository.revokedAllByUserEmail(userEmail);
 
         EmailVerificationToken emailVerificationToken = EmailVerificationToken.builder()
                 .userEmail(userEmail)
@@ -81,6 +74,7 @@ public class EmailVerificationTokenService {
      * @exception TokenNotFound se il token non esiste
      * @exception TokenExpired se è scaduto
      */
+    @Transactional
     public EmailVerificationToken verifyToken(String token){
         log.info("[EMAIL VERIFICATION TOKEN] Validazione del token");
 

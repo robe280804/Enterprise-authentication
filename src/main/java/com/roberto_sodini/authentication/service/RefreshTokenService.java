@@ -40,17 +40,12 @@ public class RefreshTokenService {
         String token = jwtService.generateToken(false, userDetails);
         String hashToken = DigestUtils.sha3_256Hex(token);
 
-        List<RefreshToken> userTokens = refreshTokenRepository.findAllByUser(user);
-
-        if (!userTokens.isEmpty()){
-            userTokens.forEach(tkn ->
-                tkn.setRevoked(true));
-            refreshTokenRepository.saveAll(userTokens);
-        }
+        // Query per evitare N+1
+        refreshTokenRepository.revokedAllForUserEmail(email);
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)
-                .refreshToken(token)
+                .refreshToken(hashToken)
                 .expiryDate(LocalDateTime.now().plusDays(1))
                 .revoked(false)
                 .build();
