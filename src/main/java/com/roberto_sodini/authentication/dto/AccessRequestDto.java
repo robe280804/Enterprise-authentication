@@ -1,11 +1,13 @@
 package com.roberto_sodini.authentication.dto;
 
+import com.roberto_sodini.authentication.security.audit.AuditUserField;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
 public class AccessRequestDto {
 
+    @AuditUserField
     @NotBlank(message = "L'email non può essere vuota")
     @Email(message = "Formato email non valido")
     @Pattern(

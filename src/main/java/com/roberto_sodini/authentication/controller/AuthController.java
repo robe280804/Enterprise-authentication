@@ -4,6 +4,7 @@ import com.roberto_sodini.authentication.dto.AccessRequestDto;
 import com.roberto_sodini.authentication.dto.EmailDto;
 import com.roberto_sodini.authentication.dto.LoginResponseDto;
 import com.roberto_sodini.authentication.dto.RegisterResponseDto;
+import com.roberto_sodini.authentication.security.audit.AuditAction;
 import com.roberto_sodini.authentication.security.ratelimiter.RateLimit;
 import com.roberto_sodini.authentication.service.AuthService;
 import com.roberto_sodini.authentication.service.ResetPasswordService;

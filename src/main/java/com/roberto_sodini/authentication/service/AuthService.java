@@ -14,6 +14,7 @@ import com.roberto_sodini.authentication.producer.LoginHistoryProducer;
 import com.roberto_sodini.authentication.repository.RefreshTokenRepository;
 import com.roberto_sodini.authentication.repository.UserRepository;
 import com.roberto_sodini.authentication.security.UserDetailsImpl;
+import com.roberto_sodini.authentication.security.audit.AuditAction;
 import com.roberto_sodini.authentication.security.jwt.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -116,9 +117,10 @@ public class AuthService {
      * @param servletRequest per accedere ai dati del client
      * @return DTO con i dati di accesso
      */
+    @AuditAction(action = "LOGIN_USER", logFinalResault = true)
     @Transactional
     public LoginResponseDto login(@Valid AccessRequestDto request, HttpServletRequest servletRequest) {
-        log.info("[LOGIN] Login in esecuzione per {}", request.getEmail());
+        //log.info("[LOGIN] Login in esecuzione per {}", request.getEmail());
 
         String userIp = servletRequest.getRemoteAddr();
         String userAgent = servletRequest.getHeader("User-agent");
@@ -133,7 +135,7 @@ public class AuthService {
 
 
         if (!userRepository.existsByEmail(request.getEmail())){
-            log.warn("[LOGIN] Login fallito, email {} non presente nel sistema", request.getEmail());
+            //log.warn("[LOGIN] Login fallito, email {} non presente nel sistema", request.getEmail());
             loginHistoryDto.setSuccess(false);
             loginHistoryDto.setFailureReason("Email non registrata");
 
@@ -147,7 +149,7 @@ public class AuthService {
         UserDetailsImpl userDetails = (UserDetailsImpl) auth.getPrincipal();
 
         if (!userDetails.getProvider().equals(AuthProvider.LOCALE)){
-            log.warn("[LOGIN] Fallito per email {}, accesso già eseguito con {}", request.getEmail(), userDetails.getProvider());
+            //log.warn("[LOGIN] Fallito per email {}, accesso già eseguito con {}", request.getEmail(), userDetails.getProvider());
             loginHistoryDto.setSuccess(false);
             loginHistoryDto.setFailureReason("Provider errato");
 
