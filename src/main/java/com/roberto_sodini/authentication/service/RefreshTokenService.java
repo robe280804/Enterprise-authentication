@@ -41,7 +41,7 @@ public class RefreshTokenService {
         String hashToken = DigestUtils.sha3_256Hex(token);
 
         // Query per evitare N+1
-        refreshTokenRepository.revokedAllForUserEmail(email);
+        refreshTokenRepository.revokedAllForUser(user);
 
         RefreshToken refreshToken = RefreshToken.builder()
                 .user(user)

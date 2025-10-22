@@ -2,6 +2,8 @@ package com.roberto_sodini.authentication.security.config;
 
 import com.roberto_sodini.authentication.enums.AuthProvider;
 import com.roberto_sodini.authentication.security.UserDetailsServiceImpl;
+import com.roberto_sodini.authentication.security.oauth2.FailureHandlerImpl;
+import com.roberto_sodini.authentication.security.oauth2.SuccessHandlerImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,11 +27,14 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final UserDetailsServiceImpl userDetailsService;
+    private final SuccessHandlerImpl successHandler;
+    private final FailureHandlerImpl failureHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> {})
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(request -> {
@@ -37,6 +42,10 @@ public class SecurityConfig {
                     request.anyRequest().authenticated();
                 })
                 .authenticationProvider(provider())
+                .oauth2Login(oauth2 -> {
+                    oauth2.successHandler(successHandler);
+                    oauth2.failureHandler(failureHandler);
+                })
                 .build();
     }
 

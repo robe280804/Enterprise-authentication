@@ -18,6 +18,6 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     List<RefreshToken> findAllByUserAndNonRevoked(@Param("user") User user);
 
     @Modifying
-    @Query("UPDATE RefreshToken r SET r.revoked = true WHERE r.email = :email")
-    void revokedAllForUserEmail(@Param("email") String email);
+    @Query("UPDATE RefreshToken r SET r.revoked = true WHERE r.user = :user")
+    void revokedAllForUser(@Param("user") User user);
 }

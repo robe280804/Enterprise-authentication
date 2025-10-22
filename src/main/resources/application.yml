@@ -51,6 +51,18 @@ spring:
         spring.json.trusted.packages: "*"  # permette di deserializzare
       auto-offset-reset: earliest
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+
+
 
 jwt:
   secret: ${JWT_SECRET}
