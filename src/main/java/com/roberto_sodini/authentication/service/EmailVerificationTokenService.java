@@ -4,6 +4,7 @@ import com.roberto_sodini.authentication.exceptions.TokenExpired;
 import com.roberto_sodini.authentication.exceptions.TokenNotFound;
 import com.roberto_sodini.authentication.model.EmailVerificationToken;
 import com.roberto_sodini.authentication.repository.EmailVerificationTokenRepository;
+import com.roberto_sodini.authentication.security.audit.AuditAction;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -35,9 +36,9 @@ public class EmailVerificationTokenService {
      * @param password dell'utente
      * @return token
      */
+    @AuditAction(action = "CREATE_REGISTRATION_TOKEN")
     @Transactional
     public String createToken(String userEmail, String password){
-        log.info("[EMAIL VERIFICATION TOKEN] Creazione del token per l'utente {}", userEmail);
 
         String token = UUID.randomUUID().toString();
         String hashToken = DigestUtils.sha3_256Hex(token);
@@ -55,7 +56,6 @@ public class EmailVerificationTokenService {
                 .build();
 
         emailVerificationTokenRepository.save(emailVerificationToken);
-        log.info("[EMAIL VERIFICATION TOKEN] Token creato con successo");
 
         return token;
     }

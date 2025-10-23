@@ -91,7 +91,29 @@ Async logging/audit (Kafka) con retries e DLQ) — non blocca flusso principale
 - **revoked** (Boolean)
 - **resetSuccess** (Boolean)
 
+# Stack tecnologico
 
-# Redis
-Redis è un database in-memory che permette di conservare in dati in memoria RAM, rendendolo molto più veloce rispetto a MySQL...
+## Backend
+- Java 21
+- Spring Boot {
+    - spring-boot-starter-web – Creazione di API REST e gestione delle richieste HTTP.
+    - spring-boot-starter-data-jpa – Integrazione con JPA/Hibernate per la persistenza dei dati.
+    - spring-boot-starter-security – Sicurezza e gestione autenticazione/authorization.
+    - spring-boot-starter-validation – Validazione dei dati tramite annotazioni.
+    - spring-boot-starter-mail – Invio di email dalla piattaforma.
+    - spring-boot-starter-thymeleaf – Template engine per la generazione di pagine HTML.
+    - spring-boot-starter-data-redis – Integrazione con Redis per gestione del rate-limit.
+    - spring-boot-starter-oauth2-client – Supporto per autenticazione OAuth2.
+  }
+- Spring Kafka – Integrazione con Apache Kafka per messaggistica.
 
+## Database
+- MySQL
+- Liquibase – Gestione versionata dello schema del database.
+
+## Sicurezza e Token
+- JWT – Creazione e gestione di JSON Web Token per autenticazione stateless.
+
+## Utilità
+- Lombok 
+- Apache Commons Codec – Utilità per codifica e hashing di dati.

@@ -9,6 +9,7 @@ import com.roberto_sodini.authentication.model.ResetPassword;
 import com.roberto_sodini.authentication.model.User;
 import com.roberto_sodini.authentication.repository.ResetPasswordRepository;
 import com.roberto_sodini.authentication.repository.UserRepository;
+import com.roberto_sodini.authentication.security.audit.AuditAction;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,8 +43,8 @@ public class ResetPasswordService {
      * @param request
      * @return
      */
+    @AuditAction(action = "RESET_PASSWORD")
     public String resetPassword(@Valid EmailDto request) {
-        log.info("[RESET PASSWORD REQUEST] Richiesta di reset password da {}", request.getEmail());
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new EmailNotRegister("Utente non trovato"));
@@ -55,18 +56,19 @@ public class ResetPasswordService {
 
     /**
      *
-     * @param reqeust
+     * @param request
      * @return
      */
-    public String saveNewPassword(@Valid ResetPasswordDto reqeust) {
-        ResetPassword resetPassword = validateToken(reqeust.getToken());
+    public String saveNewPassword(@Valid ResetPasswordDto request) {
+        ResetPassword resetPassword = validateToken(request.getToken());
 
         User user = resetPassword.getUser();
 
-        String newPassword = encoder.encode(reqeust.getPassword());
+        String newPassword = encoder.encode(request.getPassword());
         user.setPassword(newPassword);
         userRepository.save(user);
 
+        log.info("[RESET_PASSWORD] Password aggiornata con succesoo");
         return "Password cambiata con successo";
     }
 

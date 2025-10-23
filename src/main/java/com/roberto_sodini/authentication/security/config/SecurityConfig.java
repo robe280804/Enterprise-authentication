@@ -2,6 +2,7 @@ package com.roberto_sodini.authentication.security.config;
 
 import com.roberto_sodini.authentication.enums.AuthProvider;
 import com.roberto_sodini.authentication.security.UserDetailsServiceImpl;
+import com.roberto_sodini.authentication.security.jwt.JwtFilter;
 import com.roberto_sodini.authentication.security.oauth2.FailureHandlerImpl;
 import com.roberto_sodini.authentication.security.oauth2.SuccessHandlerImpl;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -29,6 +31,7 @@ public class SecurityConfig {
     private final UserDetailsServiceImpl userDetailsService;
     private final SuccessHandlerImpl successHandler;
     private final FailureHandlerImpl failureHandler;
+    private final JwtFilter jwtFilter;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -46,6 +49,7 @@ public class SecurityConfig {
                     oauth2.successHandler(successHandler);
                     oauth2.failureHandler(failureHandler);
                 })
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

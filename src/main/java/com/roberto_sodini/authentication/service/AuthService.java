@@ -67,11 +67,10 @@ public class AuthService {
      * @return messaggio per confermare l'invio dell'email
      * @exception EmailAlredyRegistered se l'email è gia registrata
      */
+    @AuditAction(action = "REGISTRATION_USER", logFinalResault = true)
     public String register(@Valid AccessRequestDto request) {
-        log.info("[REGISTER] Registrazione in esecuzione per {}", request.getEmail());
 
         if (userRepository.existsByEmail(request.getEmail())){
-            log.warn("[REGISTER] Registrazione fallita, email {} già presente nel sistema", request.getEmail());
             throw new EmailAlredyRegistered("Email già registrata");
         }
         String token = verificationTokenService.createToken(request.getEmail(), request.getPassword());
@@ -83,6 +82,7 @@ public class AuthService {
 
         return "Ti è stata inviata un email per confermare la registrazione";
     }
+
 
     public RegisterResponseDto confirmRegister(String token) {
         EmailVerificationToken emailVerificationToken = verificationTokenService.verifyToken(token);
@@ -196,6 +196,7 @@ public class AuthService {
     private void sendLoginHistory(LoginHistoryDto loginHistoryDto){
         loginHistoryProducer.sendLoginHistory(loginHistoryDto);
     }
+
 
     public String logout() {
        User user = (User) SecurityContextHolder.getContext().getAuthentication();

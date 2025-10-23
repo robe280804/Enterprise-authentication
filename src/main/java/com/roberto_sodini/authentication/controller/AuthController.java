@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
-    private final ResetPasswordService resetPasswordService;
 
     @RateLimit(limit = 5, timesWindowSecond = 60)
     @PostMapping("/register")
@@ -39,6 +39,7 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(request, servletRequest));
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping("/logout")
     public ResponseEntity<String> logout(){
         return ResponseEntity.ok(authService.logout());

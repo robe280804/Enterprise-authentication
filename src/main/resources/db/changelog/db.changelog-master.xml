@@ -5,6 +5,7 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd"
 >
+    <!--
     <changeSet id="20231016-1-add-register-success" author="Roberto Sodini">
         <addColumn tableName="register_token">
             <column name="register_success" type="BOOLEAN" defaultValueBoolean="false">
@@ -22,6 +23,7 @@
         <dropForeignKeyConstraint baseTableName="login_history" constraintName="FK20v0mimmdegh2afs39uixlxpm" />
         <dropColumn tableName="login_history" columnName="user_id" />
     </changeSet>
+    -->
 
 
     <!--

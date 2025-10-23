@@ -1,6 +1,6 @@
 package com.roberto_sodini.authentication.security.audit;
 
-import com.roberto_sodini.authentication.model.User;
+import com.roberto_sodini.authentication.security.ratelimiter.RateLimit;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+
 @Aspect
 @Component
 @Slf4j
@@ -24,30 +25,26 @@ public class AuditActionAspect {
         Method method = signature.getMethod();
         AuditAction auditAction = method.getAnnotation(AuditAction.class);
 
-        String userIdentifier =  getUserName();
+        String userIdentifier = getUserIdentifier(joinPoint);
 
-        if (userIdentifier.equalsIgnoreCase("non autenticato") || userIdentifier.equalsIgnoreCase("anonymousUser")){
-            userIdentifier = extractUserFromParam(joinPoint.getArgs());
-        }
-
-        log.info("[AUDIT] User {} sta eseguendo {}",userIdentifier, auditAction.action());
+        log.info("[AUDIT] User '{}' sta eseguendo azione '{}'",
+                userIdentifier, auditAction.action());
 
         try {
-
             Object result = joinPoint.proceed();
 
             if (auditAction.logFinalResault()){
                 log.info("[AUDIT] User {} ha completato con successo {} con risultato {}",
-                        userIdentifier, auditAction.action(), result);
+                         userIdentifier, auditAction.action(), result);
             } else {
                 log.info("[AUDIT] User {} ha completato con successo {}",
-                        userIdentifier, auditAction.action());
+                         userIdentifier, auditAction.action());
             }
 
             return result;
 
-        } catch (Throwable ex){
-            log.error("User {} ha tentato {} ma è fallito {}",
+        } catch (Throwable ex) {
+            log.error("[AUDIT] User {} ha tentato {} ma è fallito {}",
                     userIdentifier, auditAction.action(), ex.getMessage(), ex);
             throw ex;
         }
@@ -71,9 +68,18 @@ public class AuditActionAspect {
         return "Non dichiarato";
     }
 
-        private String getUserName () {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            return (authentication != null && authentication.isAuthenticated()) ? authentication.getName() : "Non autenticato";
+        private String getUserIdentifier(ProceedingJoinPoint joinPoint) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+                return auth.getName();
+            }
+
+            String userIdentifier = extractUserFromParam(joinPoint.getArgs());
+            if (!userIdentifier.equalsIgnoreCase("non dichiarato")){
+                return userIdentifier;
+            }
+
+            return "Non dichiarato";
         }
 
 }
