@@ -21,6 +21,9 @@ target/
 
 .env
 
+# Keystore per HTTPS
+src/main/resources/dev-https.p12
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
