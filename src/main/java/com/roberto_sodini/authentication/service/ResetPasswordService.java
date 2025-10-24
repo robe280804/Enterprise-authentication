@@ -3,6 +3,7 @@ package com.roberto_sodini.authentication.service;
 import com.roberto_sodini.authentication.dto.EmailDto;
 import com.roberto_sodini.authentication.dto.ResetPasswordDto;
 import com.roberto_sodini.authentication.exceptions.EmailNotRegister;
+import com.roberto_sodini.authentication.exceptions.PasswordInvalid;
 import com.roberto_sodini.authentication.exceptions.TokenExpired;
 import com.roberto_sodini.authentication.exceptions.TokenNotFound;
 import com.roberto_sodini.authentication.model.ResetPassword;
@@ -44,6 +45,7 @@ public class ResetPasswordService {
      * @return
      */
     @AuditAction(action = "RESET_PASSWORD")
+    @Transactional
     public String resetPassword(@Valid EmailDto request) {
 
         User user = userRepository.findByEmail(request.getEmail())
@@ -59,7 +61,11 @@ public class ResetPasswordService {
      * @param request
      * @return
      */
+    @Transactional
     public String saveNewPassword(@Valid ResetPasswordDto request) {
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new PasswordInvalid("Le password devoo essere uguali");
+        }
         ResetPassword resetPassword = validateToken(request.getToken());
 
         User user = resetPassword.getUser();
@@ -117,7 +123,6 @@ public class ResetPasswordService {
 
         emailService.sendHtmlEmail("reset_password", email, emailUsername, var);
 
-        log.info("[RESET PASSWORD REQUEST] Email inviata per il reset");
         return "Ti è stata inviata un email per creare una nuova password";
     }
 }

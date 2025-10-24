@@ -14,6 +14,21 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(PasswordInvalid.class)
+     public ResponseEntity<Object> passwordInvalid(PasswordInvalid ex, WebRequest request){
+        return generateResponse("PASSWORD_NOT_EQUALS", HttpStatus.CONFLICT, ex, request);
+    }
+
+    @ExceptionHandler(WrongAuthProvider.class)
+    public ResponseEntity<Object> wrongAuthProvider(WrongAuthProvider ex, WebRequest request){
+        return generateResponse("WRONG_AUTH_PROVIDER", HttpStatus.UNAUTHORIZED, ex, request);
+    }
+
+    @ExceptionHandler(EmailNotRegister.class)
+    public ResponseEntity<Object> emailNotRegister(EmailNotRegister ex, WebRequest request){
+        return generateResponse("EMAIL_NOT_REGISTERED", HttpStatus.NOT_FOUND, ex, request);
+    }
+
     @ExceptionHandler(EmailAlredyRegistered.class)
     public ResponseEntity<Object> emailAlredyRegistered(EmailAlredyRegistered ex, WebRequest request){
         return generateResponse("EMAIL_ALREDY_REGISTERED", HttpStatus.CONFLICT, ex, request);

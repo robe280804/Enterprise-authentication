@@ -41,4 +41,16 @@ public class AuthMapper {
                 .loginTime(dto.getLoginTime())
                 .build();
     }
+
+    public LoginHistoryDto toDto(LoginHistory loginHistory) {
+        return LoginHistoryDto.builder()
+                .userEmail(loginHistory.getUserEmail())
+                .ipAddress(loginHistory.getIpAddress())
+                .userAgent(loginHistory.getUserAgent())
+                .loginProvider(AuthProvider.LOCALE)
+                .success(loginHistory.isSuccess())
+                .failureReason(loginHistory.getFailureReason())
+                .loginTime(loginHistory.getLoginTime())
+                .build();
+    }
 }

@@ -31,11 +31,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         log.info("[FILTRO RICHIESTE] Filtro in esecuzione");
 
-        if (request.getRequestURI().startsWith("/api/auth/**")){
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer")){
             filterChain.doFilter(request, response);
@@ -45,7 +40,8 @@ public class JwtFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
         String userEmail = jwtService.estraiEmail(token);
 
-        if (userEmail != null && SecurityContextHolder.getContext() == null){
+
+        if (userEmail != null){
             UserDetailsImpl userDetails = (UserDetailsImpl) userDetailsService.loadUserByUsername(userEmail);
 
             if (jwtService.isTokenValid(token, userDetails)){
@@ -56,6 +52,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(auth);
+
+                log.info("[FILTRO] Security context popolato con successo {}", auth);
             }
         }
         filterChain.doFilter(request, response);

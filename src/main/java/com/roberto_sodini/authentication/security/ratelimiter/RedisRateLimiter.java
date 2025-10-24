@@ -75,7 +75,7 @@ public class RedisRateLimiter {
                 }
 
                 // Imposto la scadenza della chiave riferente al livello di blocco
-                stringRedisTemplate.opsForValue().set(blockKey, String.valueOf(blockLevel), Duration.ofMinutes(10));  // Ogni 10 minuti si resetta
+                stringRedisTemplate.opsForValue().set(blockKey, String.valueOf(blockLevel), Duration.ofMinutes(5));  // Ogni 10 minuti si resetta
                 stringRedisTemplate.opsForValue().set(levelKey, "blocked", Duration.ofSeconds(blockSecond));
                 stringRedisTemplate.delete(countKey);
 

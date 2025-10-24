@@ -7,15 +7,18 @@ import com.roberto_sodini.authentication.exceptions.EmailNotRegister;
 import com.roberto_sodini.authentication.mapper.UserMapper;
 import com.roberto_sodini.authentication.model.User;
 import com.roberto_sodini.authentication.repository.UserRepository;
+import com.roberto_sodini.authentication.security.UserDetailsImpl;
 import com.roberto_sodini.authentication.security.audit.AuditAction;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,7 +70,10 @@ public class UserService {
 
     private UUID getUserId(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return (UUID) auth.getPrincipal();
+        if (auth != null && auth.getPrincipal() instanceof UserDetailsImpl userDetails){
+            return userDetails.getId();
+        }
+        throw new AuthenticationCredentialsNotFoundException("Non sei autorizzatto");
     }
 
 }

@@ -62,6 +62,12 @@ spring:
               - email
               - profile
 
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    cache: false
+
 
 
 jwt:

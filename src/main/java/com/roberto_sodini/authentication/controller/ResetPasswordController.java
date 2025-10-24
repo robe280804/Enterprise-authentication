@@ -1,11 +1,13 @@
 package com.roberto_sodini.authentication.controller;
 
+
 import com.roberto_sodini.authentication.dto.EmailDto;
 import com.roberto_sodini.authentication.dto.ResetPasswordDto;
 import com.roberto_sodini.authentication.service.ResetPasswordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -20,7 +22,13 @@ public class ResetPasswordController {
         return ResponseEntity.ok(resetPasswordService.resetPassword(request));
     }
 
-    @PostMapping("/reset-confirm")
+    @GetMapping("/confirm")
+    public String showResetPasswordPage(@RequestParam("token") String token, Model model) {
+        model.addAttribute("token", token);
+        return "form_reset_password";
+    }
+
+    @PostMapping("/save")
     public ResponseEntity<String> saveNewPassword(@RequestBody @Valid ResetPasswordDto reqeust){
         return ResponseEntity.ok(resetPasswordService.saveNewPassword(reqeust));
     }

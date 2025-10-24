@@ -9,6 +9,7 @@
 -  Creo il nuovo utente e lo salvo nel database, ottenendo i suoi dati dal modello salvato nel db.
 - Tutti gli eventi importanti (creazione token, invio email, conferma registrazione, errori) sono loggati in modo strutturato.
 
+
 ## Flusso Login utente
 - Il client invia le credenziali email e password
 - Creo un Login History per tener traccia del tentativo di login, a ogni eccezione lo imposto come non eseguito e 

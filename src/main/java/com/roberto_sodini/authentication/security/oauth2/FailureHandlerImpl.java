@@ -24,8 +24,5 @@ public class FailureHandlerImpl implements AuthenticationFailureHandler {
 
         log.warn("[OAUTH2 FAILURE] Provider {} | Reason {}", provider, exception.getMessage());
 
-        String redirectUlr = "http://localhost:5173/login";
-
-        response.sendRedirect(redirectUlr);
     }
 }
