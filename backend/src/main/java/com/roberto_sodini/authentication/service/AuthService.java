@@ -120,7 +120,6 @@ public class AuthService {
     @AuditAction(action = "LOGIN_USER", logFinalResault = true)
     @Transactional
     public LoginResponseDto login(@Valid AccessRequestDto request, HttpServletRequest servletRequest) {
-        //log.info("[LOGIN] Login in esecuzione per {}", request.getEmail());
 
         String userIp = servletRequest.getRemoteAddr();
         String userAgent = servletRequest.getHeader("User-agent");
@@ -135,7 +134,6 @@ public class AuthService {
 
 
         if (!userRepository.existsByEmail(request.getEmail())){
-            //log.warn("[LOGIN] Login fallito, email {} non presente nel sistema", request.getEmail());
             loginHistoryDto.setSuccess(false);
             loginHistoryDto.setFailureReason("Email non registrata");
 
@@ -149,7 +147,6 @@ public class AuthService {
         UserDetailsImpl userDetails = (UserDetailsImpl) auth.getPrincipal();
 
         if (!userDetails.getProvider().equals(AuthProvider.LOCALE)){
-            //log.warn("[LOGIN] Fallito per email {}, accesso già eseguito con {}", request.getEmail(), userDetails.getProvider());
             loginHistoryDto.setSuccess(false);
             loginHistoryDto.setFailureReason("Provider errato");
 

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="6fb695be-1c07-4fe8-88ec-b6a62494b77a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.mvn/wrapper/maven-wrapper.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/mvnw.cmd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/AuthenticationApplication.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/config/KafkaErrorHandlerConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/consumer/LoginHistoryConsumer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/controller/AuthController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/controller/ResetPasswordController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/controller/UserController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/dto/AccessRequestDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/dto/CreateUserDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/dto/EmailDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/dto/LoginHistoryDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/dto/LoginResponseDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/dto/RegisterResponseDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/dto/ResetPasswordDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/dto/UserDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/enums/AuthProvider.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/enums/Role.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/exceptions/EmailAlredyRegistered.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/exceptions/EmailNotRegister.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/exceptions/GlobalExceptionHandler.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/exceptions/RateLimitExceed.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/exceptions/TokenExpired.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/exceptions/TokenNotFound.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/exceptions/WrongAuthProvider.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/mapper/AuthMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/mapper/UserMapper.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/model/EmailVerificationToken.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/model/LoginHistory.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/model/RefreshToken.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/model/ResetPassword.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/model/User.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/producer/LoginHistoryProducer.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/repository/EmailVerificationTokenRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/repository/LoginHistoryRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/repository/RefreshTokenRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/repository/ResetPasswordRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/repository/UserRepository.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/security/UserDetailsImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/security/UserDetailsServiceImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/security/audit/AuditAction.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/security/audit/AuditActionAspect.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/security/audit/AuditUserField.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/security/config/CorsConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/security/config/SecurityConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/security/jwt/JwtFilter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/security/jwt/JwtService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/security/oauth2/FailureHandlerImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/security/oauth2/SuccessHandlerImpl.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/security/ratelimiter/RateLimit.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/security/ratelimiter/RateLimitAspect.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/security/ratelimiter/RedisRateLimiter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/AuthService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/EmailService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/EmailVerificationTokenService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/RefreshTokenService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/ResetPasswordService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/UserService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/changelog/db.changelog-master.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/register_confirm.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/java/com/roberto_sodini/authentication/AuthenticationApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/test/resources/application-test.yml" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Enum" />
+        <option value="Exception" />
+        <option value="HTML File" />
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="346LstbrILbdgrSopXuGgNJ64hh" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.Unnamed.executor&quot;: &quot;Run&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/UTENTE/Desktop/authentication&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.roberto_sodini.authentication.security.jwt" />
+      <recent name="com.roberto_sodini.authentication.dto" />
+      <recent name="com.roberto_sodini.authentication.service" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\UTENTE\Desktop\authentication\src\main\resources\db\changelog" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="envFilePaths">
+        <option value="$PROJECT_DIR$/.env" />
+      </option>
+      <option name="MAIN_CLASS_NAME" value="com.roberto_sodini.authentication.AuthenticationApplication" />
+      <module name="authentication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6fb695be-1c07-4fe8-88ec-b6a62494b77a" name="Changes" comment="" />
+      <created>1760529286473</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1760529286473</updated>
+    </task>
+    <servers />
+  </component>
+</project>

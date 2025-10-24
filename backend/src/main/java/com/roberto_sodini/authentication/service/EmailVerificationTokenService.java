@@ -36,9 +36,9 @@ public class EmailVerificationTokenService {
      * @param password dell'utente
      * @return token
      */
-    @AuditAction(action = "CREATE_REGISTRATION_TOKEN")
     @Transactional
     public String createToken(String userEmail, String password){
+        log.info("[TOKEN_REGISTRATION_CREATE] Creazione token per {}", userEmail);
 
         String token = UUID.randomUUID().toString();
         String hashToken = DigestUtils.sha3_256Hex(token);
@@ -52,11 +52,13 @@ public class EmailVerificationTokenService {
                 .userPassword(hashPassword)
                 .token(hashToken)
                 .expiryDate(LocalDateTime.now().plusMinutes(5))
+                .registerSuccess(false)
                 .revoked(false)
                 .build();
 
         emailVerificationTokenRepository.save(emailVerificationToken);
 
+        log.info("[TOKEN_REGISTRATION] Token creato con successo");
         return token;
     }
 
@@ -76,7 +78,7 @@ public class EmailVerificationTokenService {
      */
     @Transactional
     public EmailVerificationToken verifyToken(String token){
-        log.info("[EMAIL VERIFICATION TOKEN] Validazione del token");
+        log.info("[TOKEN_REGISTRATION_VERIFY] Validazione del token");
 
         String hashToken = DigestUtils.sha3_256Hex(token);
 
@@ -92,6 +94,7 @@ public class EmailVerificationTokenService {
         emailVerificationToken.setRegisterSuccess(true);
         emailVerificationTokenRepository.save(emailVerificationToken);
 
+        log.info("[TOKEN_REGISTRATION_VERIFY] Token valido");
         return emailVerificationToken;
     }
 }
