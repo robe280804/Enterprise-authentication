@@ -29,7 +29,7 @@ public class AuthController {
     }
 
     @GetMapping("/confirm-register")
-    public ResponseEntity<RegisterResponseDto> confirmRegister(@RequestParam String token){
+    public ResponseEntity<RegisterResponseDto> confirmRegister(@RequestParam("token")String token){
         return ResponseEntity.status(201).body(authService.confirmRegister(token));
     }
 
