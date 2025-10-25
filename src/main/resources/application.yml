@@ -1,7 +1,6 @@
 server:
   port: 8443
 
-
   ssl:
     key-store: classpath:dev-https.p12
     key-store-password: ${HTTPS_PASSWORD}

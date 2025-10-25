@@ -1,11 +1,35 @@
 version: "3.9"
 
 services:
+  authentication:
+    build:
+      context: .
+    container_name: enterprise-auth-app
+    ports:
+      - "8443:8443"
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      HTTPS_PASSWORD: ${HTTPS_PASSWORD}
+      EMAIL_USERNAME: ${EMAIL_USERNAME}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      OAUTH2_GOOGLE_ID: ${OAUTH2_GOOGLE_ID}
+      OAUTH2_GOOGLE_SECRET: ${OAUTH2_GOOGLE_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      - redis
+      - kafka
+      - zookeeper
+    volumes:
+      - ./src/main/resources/dev-https.p12:/app/dev-https.p12
+
+
   redis:
     image: redis:7.2-alpine
     container_name: my-redis
     ports:
-      - "6379:6379"           # mappa la porta locale 6379
+      - "6379:6379"
     volumes:
       - redis-data:/data
     restart: unless-stopped
@@ -30,6 +54,19 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     depends_on:
       - zookeeper
+
+  mysql:
+    image: mysql:8.0
+    container_name: my-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: example
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
 
 volumes:
   redis-data:

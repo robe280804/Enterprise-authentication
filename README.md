@@ -115,7 +115,7 @@ CAPTCHA / reCAPTCHA (step up dopo N tentativi o sempre su registrazione)
     - spring-boot-starter-thymeleaf – Template engine per la generazione di pagine HTML.
     - spring-boot-starter-data-redis – Integrazione con Redis per gestione del rate-limit.
     - spring-boot-starter-oauth2-client – Supporto per autenticazione OAuth2.
-  }
+}
 - Spring Kafka – Integrazione con Apache Kafka per messaggistica.
 
 ## Database
