@@ -73,6 +73,8 @@ public class AuthService {
         if (userRepository.existsByEmail(request.getEmail())){
             throw new EmailAlredyRegistered("Email già registrata");
         }
+
+        // Creazione token per invio dell'email
         String token = verificationTokenService.createToken(request.getEmail(), request.getPassword());
 
         Map<String, Object> var = new HashMap<>();
@@ -85,6 +87,8 @@ public class AuthService {
 
 
     public RegisterResponseDto confirmRegister(String token) {
+
+        // Verifico la validità del token
         EmailVerificationToken emailVerificationToken = verificationTokenService.verifyToken(token);
 
         User newUser = User.builder()
@@ -124,6 +128,7 @@ public class AuthService {
         String userIp = servletRequest.getRemoteAddr();
         String userAgent = servletRequest.getHeader("User-agent");
 
+        // History del login
         LoginHistoryDto loginHistoryDto = LoginHistoryDto.builder()
                 .ipAddress(userIp)
                 .userEmail(request.getEmail())
@@ -131,16 +136,6 @@ public class AuthService {
                 .loginTime(LocalDateTime.now())
                 .loginProvider(AuthProvider.LOCALE)
                 .build();
-
-
-        if (!userRepository.existsByEmail(request.getEmail())){
-            loginHistoryDto.setSuccess(false);
-            loginHistoryDto.setFailureReason("Email non registrata");
-
-            // Invio a kafka per il salvataggio
-            sendLoginHistory(loginHistoryDto);
-            throw new EmailNotRegister("Email non registrata");
-        }
 
         // Autenticazione utente
         Authentication auth = userAuth(request, loginHistoryDto);
@@ -160,7 +155,7 @@ public class AuthService {
         // Generamento e salvataggio nel db del refresh-token
         String refreshToken = refreshTokenService.create(userDetails.getEmail());
 
-        // Chiamata kafka per generare un login history
+        // Invio a kafka per il salvataggio
         loginHistoryDto.setSuccess(true);
         sendLoginHistory(loginHistoryDto);
 
@@ -179,6 +174,8 @@ public class AuthService {
         } catch (BadCredentialsException ex) {
             loginHistoryDto.setSuccess(false);
             loginHistoryDto.setFailureReason("Credenziali errate");
+
+            // Invio a kafka per il salvataggio
             sendLoginHistory(loginHistoryDto);
 
             log.warn("[LOGIN] Fallito per email {}: {}", request.getEmail(), ex.getMessage());
@@ -199,10 +196,7 @@ public class AuthService {
        User user = (User) SecurityContextHolder.getContext().getAuthentication();
         log.info("[LOGOUT] Logout in esecuzione per {}", user.getEmail());
 
-        List<RefreshToken> userTokens = refreshTokenRepository.findAllByUserAndNonRevoked(user);
-        userTokens.forEach(tkn -> tkn.setRevoked(true));
-        refreshTokenRepository.saveAll(userTokens);
-
+        refreshTokenRepository.revokedAllForUser(user);
         SecurityContextHolder.clearContext();
 
         log.info("[LOGOUT] Logout eseguito con successo");

@@ -7,14 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface EmailVerificationTokenRepository extends JpaRepository<EmailVerificationToken, Long> {
     Optional<EmailVerificationToken> findByToken(String token);
-
-    List<EmailVerificationToken> findAllByUserEmail(String userEmail);
 
     @Modifying
     @Query("UPDATE EmailVerificationToken t SET t.revoked = true WHERE userEmail = :userEmail ")

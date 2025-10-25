@@ -14,9 +14,6 @@ import java.util.List;
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
     List<RefreshToken> findAllByUser(User user);
 
-    @Query("SELECT r FROM RefreshToken r WHERE r.user = :user AND r.revoked = false")
-    List<RefreshToken> findAllByUserAndNonRevoked(@Param("user") User user);
-
     @Modifying
     @Query("UPDATE RefreshToken r SET r.revoked = true WHERE r.user = :user")
     void revokedAllForUser(@Param("user") User user);

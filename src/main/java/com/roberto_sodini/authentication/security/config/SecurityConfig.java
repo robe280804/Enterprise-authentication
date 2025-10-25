@@ -38,6 +38,12 @@ public class SecurityConfig {
     /// Content-Security-Policy: default-src 'none' -> blocca il caricamento di risorse esterne come scritp
     /// X-Frame-Options: DENY -> la pagina non può esser visualizzata su altri siti attraverso un frame o iframe
     /// X-Content-Type-Options: nosniff -> se il content-type non corrisponde, non viene eseguito
+    /// Strict-Transport-Security: max-age=31536000; includeSubDomains -> sito accessibile solo da https
+    /// csfr -> disabilitato
+    /// cors -> configurato al frontend
+    /// session -> sessione stateless
+    /// provider -> custom provider per recuperare l'utente
+    /// jwtfilter -> filtro per validare token
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http

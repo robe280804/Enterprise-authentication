@@ -23,6 +23,7 @@ target/
 
 # Keystore per HTTPS
 src/main/resources/dev-https.p12
+*.p12
 
 ### NetBeans ###
 /nbproject/private/
