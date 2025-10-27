@@ -8,6 +8,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -52,11 +54,19 @@ public class RateLimitAspect {
         boolean allowed = redisRateLimiter.isAllowed(key, rateLimit.limit(), rateLimit.timesWindowSecond());
 
         if (!allowed) {
-            Long time = stringRedisTemplate.getExpire(levelKey);
-            log.warn("[RATE LIMITER] Utente {} bloccato per {} secondi", clientIp, time);
-            throw new RateLimitExceed("Troppe richieste, riprova tra " + time + " secondi");
+            try {
+                Long time = stringRedisTemplate.getExpire(levelKey);
+                log.warn("[RATE LIMITER] Utente {} bloccato per {} secondi", clientIp, time);
+                throw new RateLimitExceed("Troppe richieste, riprova tra " + time + " secondi");
+            } catch (RedisConnectionFailureException ex) {
+                log.warn("[RATE LIMITER] Redis non disponibile {}", ex.getMessage());
+                return joinPoint.proceed();
+            } catch (DataAccessException ex) {
+                log.warn("[RATE LIMITER] Errore Redis {}", ex.getMessage());
+                return joinPoint.proceed();
+            }
         }
 
-        return  joinPoint.proceed();
+        return joinPoint.proceed();
     }
 }

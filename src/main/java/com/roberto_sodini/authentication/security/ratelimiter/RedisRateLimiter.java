@@ -3,6 +3,7 @@ package com.roberto_sodini.authentication.security.ratelimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -83,9 +84,15 @@ public class RedisRateLimiter {
             }
             return true;
 
+        } catch (RedisConnectionFailureException ex) {
+            log.warn("[REDIS RATE LIMITER] Redis non disponibile {}", ex.getMessage());
+            return true; // In caso di fallimento Redis, permettiamo la richiesta
         } catch (DataAccessException ex) {
-            log.error("[REDIS RATE LIMITER] Impossibile valutare il rate limiter", ex);
-            return false;
+            log.error("[REDIS RATE LIMITER] Errore di accesso ai dati Redis", ex);
+            return true; // In caso di altri errori Redis, permettiamo la richiesta
+        } catch (Exception ex) {
+            log.error("[REDIS RATE LIMITER] Errore imprevisto", ex);
+            return true; // In caso di errori imprevisti, permettiamo la richiesta
         }
     }
 }

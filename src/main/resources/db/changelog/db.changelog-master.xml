@@ -24,14 +24,14 @@
         <dropForeignKeyConstraint baseTableName="login_history" constraintName="FK20v0mimmdegh2afs39uixlxpm" />
         <dropColumn tableName="login_history" columnName="user_id" />
     </changeSet>
--->
+
     <changeSet id="20231016-4-alter-user-password-column" author="Roberto Sodini">
     <dropNotNullConstraint tableName="users" columnName="password" columnDataType="VARCHAR(255)"/>
     </changeSet>
 
 
 
-    <!--
+
       Questo file servirà come punto d’ingresso per tutte le future migrazioni.
       Ogni volta che creo nuove tabelle o alterazioni, aggiungi un nuovo <changeSet>.
     -->

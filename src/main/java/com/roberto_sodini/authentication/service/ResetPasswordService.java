@@ -119,10 +119,11 @@ public class ResetPasswordService {
 
     private String sendResetPasswordEmail(String token, String email){
         Map<String, Object> var = new HashMap<>();
-        var.put("confirmLink", "http://localhost:8080/api/password/confirm?token=" + token);
+        // Link immaginario, ci dovrebbe essere la pagina frontend con il form del reset
+        var.put("confirmLink", "https://localhost:8443/views/reset-password?token=" + token);
 
         emailService.sendHtmlEmail("reset_password", email, emailUsername, var);
 
-        return "Ti è stata inviata un email per creare una nuova password";
+        return "Ti è stata inviata un email per creare una nuova password, token=" + token;
     }
 }
