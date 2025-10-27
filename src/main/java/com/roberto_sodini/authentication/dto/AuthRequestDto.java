@@ -5,7 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
-public class AccessRequestDto {
+public class AuthRequestDto {
 
     @AuditUserField
     @NotBlank(message = "L'email non può essere vuota")

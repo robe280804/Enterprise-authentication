@@ -1,7 +1,7 @@
 package com.roberto_sodini.authentication.service;
 
 import com.roberto_sodini.authentication.dto.EmailDto;
-import com.roberto_sodini.authentication.dto.ResetPasswordDto;
+import com.roberto_sodini.authentication.dto.ResetPasswordRequestDto;
 import com.roberto_sodini.authentication.exceptions.EmailNotRegister;
 import com.roberto_sodini.authentication.exceptions.PasswordInvalid;
 import com.roberto_sodini.authentication.exceptions.TokenExpired;
@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -40,9 +39,12 @@ public class ResetPasswordService {
     private final PasswordEncoder encoder;
 
     /**
-     *
-     * @param request
-     * @return
+     *<p> Il metodo esegue i seguenti step: </p>
+     * <ul>
+     *     <li> Ottengo l'utente dall'email, se non esiste lancio un eccezione </li>
+     *     <li> Invio un email al client con il token </li>
+     * </ul>
+     * @param request DTO contenente l'email
      */
     @AuditAction(action = "RESET_PASSWORD")
     @Transactional
@@ -57,12 +59,17 @@ public class ResetPasswordService {
     }
 
     /**
-     *
-     * @param request
-     * @return
+     *<p> Il metodo esegue i seguenti step: </p>
+     * <ul>
+     *     <li> Controllo che la password e la confirmPassword siano ugali </li>
+     *     <li> Valido il token e, se positivo ottengo l'utente </li>
+     *     <li> Eseguo l'hash della password e aggiorno l'utente </li>
+     * </ul>
+     * @param request DTO con token, password e confirmPassword
+     * @return messaggio di successo
      */
     @Transactional
-    public String saveNewPassword(@Valid ResetPasswordDto request) {
+    public String saveNewPassword(@Valid ResetPasswordRequestDto request) {
         if (!request.getPassword().equals(request.getConfirmPassword())) {
             throw new PasswordInvalid("Le password devoo essere uguali");
         }
@@ -71,8 +78,11 @@ public class ResetPasswordService {
         User user = resetPassword.getUser();
 
         String newPassword = encoder.encode(request.getPassword());
-        user.setPassword(newPassword);
-        userRepository.save(user);
+        int queryResult = userRepository.setNewPassword(newPassword, user.getId());
+
+        if (queryResult != 1) {
+            throw new IllegalStateException("Fallimento nell'aggiornare la password dell'utente");
+        }
 
         log.info("[RESET_PASSWORD] Password aggiornata con succesoo");
         return "Password cambiata con successo";
@@ -83,16 +93,18 @@ public class ResetPasswordService {
     private String createToken(User user){
         log.info("[RESET PASSWORD SERVICE] Creazione del token per {}", user.getEmail());
 
+        // Creo un token e ne eseguo l'hash
         String token = UUID.randomUUID().toString();
         String hashToken = DigestUtils.sha3_256Hex(token);
 
         // Query per evitare N+1
+        // Imposto come revoked tutti i token precedenti per evitare conflitti
         resetPasswordRepository.revokedAllByUser(user);
 
         ResetPassword resetPassword = ResetPassword.builder()
                 .user(user)
                 .token(hashToken)
-                .expiryDate(LocalDateTime.now().plusMinutes(5))
+                .expiryDate(LocalDateTime.now().plusMinutes(5))  //scadenza breve
                 .revoked(false)
                 .build();
 
@@ -104,16 +116,20 @@ public class ResetPasswordService {
 
     @Transactional
     private ResetPassword validateToken(String token){
-        ResetPassword resetPassword = resetPasswordRepository.findByToken(token)
+        log.info("[RESET PASSWORD VALIDATE] Validazione del token in esecuzione");
+
+        // Ottengo attraverso una query personalizzata un model con revoked=false e che non sia expire
+        ResetPassword resetPassword = resetPasswordRepository.findValidToken(token, LocalDateTime.now())
                 .orElseThrow(() -> new TokenNotFound("Token non trovato"));
 
-        if (resetPassword.getRevoked() || resetPassword.getExpiryDate().isBefore(LocalDateTime.now())){
-            throw new TokenExpired("Token scaduto o già utilizzato");
+        // Imposto il token come revoked
+        int queryResult = resetPasswordRepository.revokedAndConfirmToken(resetPassword.getId());
+
+        if (queryResult != 1) {
+            throw new IllegalStateException("Fallimento nell'aggiornare lo stato del token");
         }
 
-        resetPassword.setRevoked(true);
-        resetPasswordRepository.save(resetPassword);
-
+        log.info("[RESET PASSWORD VALIDATE] Token valido");
         return resetPassword;
     }
 

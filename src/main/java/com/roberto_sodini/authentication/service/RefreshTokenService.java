@@ -27,7 +27,17 @@ public class RefreshTokenService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
 
-
+    /**
+     * <p> Il metodo esegue i seguenti step: </p>
+     * <ul>
+     *     <li> Ottengo l'utente dall'email passata, se non esiste lancio un eccezione </li>
+     *     <li> Genero il refresh-token ed eseguo l'hash </li>
+     *     <li> Revoco tutti i token precedenti per evitare conflitti </li>
+     *     <li> Creo il model e lo salvo nel db, ritornando il refresh-token </li>
+     * </ul>
+     * @param email
+     * @return
+     */
     @Transactional
     public String create(String email){
         log.info("[CREATE REFRESH TOKEN] Creazione refresh token per utente {}", email);
@@ -51,8 +61,8 @@ public class RefreshTokenService {
                 .build();
 
         refreshTokenRepository.save(refreshToken);
-        log.info("[CREATE REFRESH TOKEN] Refresh token creato con successo");
 
+        log.info("[CREATE REFRESH TOKEN] Refresh token creato con successo");
         return refreshToken.getRefreshToken();
     }
 

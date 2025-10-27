@@ -2,6 +2,7 @@ package com.roberto_sodini.authentication.controller;
 
 import com.roberto_sodini.authentication.dto.CreateUserDto;
 import com.roberto_sodini.authentication.dto.UserDto;
+import com.roberto_sodini.authentication.security.ratelimiter.RateLimit;
 import com.roberto_sodini.authentication.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class UserController {
 
     private final UserService userService;
 
+    @RateLimit(timesWindowSecond = 60, limit = 3)
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/")
     public ResponseEntity<UserDto> getUser(){

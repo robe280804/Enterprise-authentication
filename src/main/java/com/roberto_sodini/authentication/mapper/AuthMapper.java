@@ -42,7 +42,7 @@ public class AuthMapper {
                 .build();
     }
 
-    public LoginHistoryDto toDto(LoginHistory loginHistory) {
+    public LoginHistoryDto loginHistoryDto(LoginHistory loginHistory) {
         return LoginHistoryDto.builder()
                 .userEmail(loginHistory.getUserEmail())
                 .ipAddress(loginHistory.getIpAddress())

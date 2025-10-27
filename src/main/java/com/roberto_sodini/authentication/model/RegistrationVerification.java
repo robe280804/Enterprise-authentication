@@ -5,10 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -16,7 +14,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "register_token")
-public class EmailVerificationToken {
+public class RegistrationVerification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class ResetPasswordDto {
+public class ResetPasswordRequestDto {
 
     @NotNull(message = "La password non può essere vuota")
     @Size(min = 6, message = "La password deve essere lunga almeno 6 caratteri")

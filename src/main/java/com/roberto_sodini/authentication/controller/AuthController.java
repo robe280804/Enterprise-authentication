@@ -1,6 +1,6 @@
 package com.roberto_sodini.authentication.controller;
 
-import com.roberto_sodini.authentication.dto.AccessRequestDto;
+import com.roberto_sodini.authentication.dto.AuthRequestDto;
 import com.roberto_sodini.authentication.dto.LoginResponseDto;
 import com.roberto_sodini.authentication.dto.RegisterResponseDto;
 import com.roberto_sodini.authentication.security.ratelimiter.RateLimit;
@@ -19,23 +19,25 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @RateLimit(limit = 5, timesWindowSecond = 60)
+    @RateLimit(limit = 3, timesWindowSecond = 60)
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody @Valid AccessRequestDto request){
+    public ResponseEntity<String> register(@RequestBody @Valid AuthRequestDto request){
         return ResponseEntity.ok(authService.register(request));
     }
 
+    @RateLimit(limit = 3, timesWindowSecond = 60)
     @GetMapping("/confirm-register")
     public ResponseEntity<RegisterResponseDto> confirmRegister(@RequestParam("token")String token){
         return ResponseEntity.status(201).body(authService.confirmRegister(token));
     }
 
-    @RateLimit(limit = 5, timesWindowSecond = 60)
+    @RateLimit(limit = 3, timesWindowSecond = 60)
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid AccessRequestDto request, HttpServletRequest servletRequest){
+    public ResponseEntity<LoginResponseDto> login(@RequestBody @Valid AuthRequestDto request, HttpServletRequest servletRequest){
         return ResponseEntity.ok(authService.login(request, servletRequest));
     }
 
+    @RateLimit(limit = 10, timesWindowSecond = 60)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping("/logout")
     public ResponseEntity<String> logout(){

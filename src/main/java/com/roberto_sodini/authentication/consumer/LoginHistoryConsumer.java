@@ -4,6 +4,7 @@ import com.roberto_sodini.authentication.dto.LoginHistoryDto;
 import com.roberto_sodini.authentication.mapper.AuthMapper;
 import com.roberto_sodini.authentication.model.LoginHistory;
 import com.roberto_sodini.authentication.repository.LoginHistoryRepository;
+import com.roberto_sodini.authentication.service.LoginHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -14,14 +15,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class LoginHistoryConsumer {
 
-    private final LoginHistoryRepository loginHistoryRepository;
-    private final AuthMapper authMapper;
+    private final LoginHistoryService loginHistoryService;
 
     @KafkaListener(topics = "login-history-events", groupId = "login-group")
     public void loginHistoryConsumer(LoginHistoryDto loginHistoryDto){
         try {
-            LoginHistory loginHistory = authMapper.loginHistory(loginHistoryDto);
-            loginHistoryRepository.save(loginHistory);
+            loginHistoryService.save(loginHistoryDto);
             log.info("[LOGIN HISTORY CONSUMER] Attività ricevuta e salvata con successo");
 
         } catch (Exception e){

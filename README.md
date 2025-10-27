@@ -16,6 +16,13 @@
   in questo modo evito conflitti nell'avere più token validi
 - Invio il login history con success=true a kafka e ritorno all'utente un DTO con l'access token e altri dati di accesso
 
+## Flusso reset password
+- Il client richiede il reset password passando la sua email
+- Verifico che l'email esista nel db, se positivo gli invio un email con un token a breve scadenza e lo saalvo nel db
+- L'email in produzione conterrà come link la pagina frontend, che avrà il form per creare la nuova password e si occuperà di chiamare il backend per salvarla 
+- All'url /api/password/save passo un DTO con token, password e conferma password
+- Verifico che il token sia presente nel db e ancora valido, controllo che le password siano uguali e la salvo, eseguendo l'hash nel db
+
 
 # Security 
 

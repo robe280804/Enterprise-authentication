@@ -4,11 +4,9 @@ import com.roberto_sodini.authentication.dto.*;
 import com.roberto_sodini.authentication.enums.AuthProvider;
 import com.roberto_sodini.authentication.enums.Role;
 import com.roberto_sodini.authentication.exceptions.EmailAlredyRegistered;
-import com.roberto_sodini.authentication.exceptions.EmailNotRegister;
 import com.roberto_sodini.authentication.exceptions.WrongAuthProvider;
 import com.roberto_sodini.authentication.mapper.AuthMapper;
-import com.roberto_sodini.authentication.model.EmailVerificationToken;
-import com.roberto_sodini.authentication.model.RefreshToken;
+import com.roberto_sodini.authentication.model.RegistrationVerification;
 import com.roberto_sodini.authentication.model.User;
 import com.roberto_sodini.authentication.producer.LoginHistoryProducer;
 import com.roberto_sodini.authentication.repository.RefreshTokenRepository;
@@ -32,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,66 +38,70 @@ import java.util.Set;
 @Slf4j
 public class AuthService {
 
-    @Value("${jwt.expiration.refresh_token}")
-    private Long longExpiration;
-
     @Value("${spring.mail.username}")
-    private String emailUsername;
+    private String systemEmail;
 
     private final UserRepository userRepository;
     private final AuthMapper authMapper;
     private final AuthenticationManager authenticationManager;
     private final RefreshTokenService refreshTokenService;
-    private final EmailVerificationTokenService verificationTokenService;
+    private final RegistrationVerificationService verificationTokenService;
     private final EmailService emailService;
     private final JwtService jwtService;
     private final LoginHistoryProducer loginHistoryProducer;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final LoginHistoryService loginHistoryService;
 
     /**
      * <p> Il metodo esegue i seguenti passaggi: </p>
      * <li>
      *     <ul> Controllo che l'email non esista nel sistema </ul>
-     *     <ul> Invio un email + token all'utente per confermare la registazione </ul>
+     *     <ul> Invio un email + token all'utente per confermare la registrazione </ul>
      * </li>
      * @param request DTO con i dati dell'utente
      * @return messaggio per confermare l'invio dell'email
      * @exception EmailAlredyRegistered se l'email è gia registrata
      */
     @AuditAction(action = "REGISTRATION_USER", logFinalResault = true)
-    public String register(@Valid AccessRequestDto request) {
+    public String register(@Valid AuthRequestDto request) {
 
         if (userRepository.existsByEmail(request.getEmail())){
             throw new EmailAlredyRegistered("Email già registrata");
         }
 
         // Creazione token per invio dell'email
-        String token = verificationTokenService.createToken(request.getEmail(), request.getPassword());
+        String token = verificationTokenService.create(request.getEmail(), request.getPassword());
 
         Map<String, Object> var = new HashMap<>();
         var.put("confirmLink", "http://localhost:8080/api/auth/confirm-register?token=" + token);
 
-        emailService.sendHtmlEmail("register_confirm", request.getEmail(), emailUsername, var);
-
+        emailService.sendHtmlEmail("register_confirm", request.getEmail(), systemEmail, var);
         return "Ti è stata inviata un email per confermare la registrazione";
     }
 
-
+    /**
+     * <p> Il metodo esegue i seguenti step: </p>
+     * <ul>
+     *     <li> Verifico che il token sia valido </li>
+     *     <li> Creo un nuovo utente e lo salvo nel db</li>
+     * </ul>
+     * @return DTO con i dati della registrazione
+     */
     public RegisterResponseDto confirmRegister(String token) {
 
         // Verifico la validità del token
-        EmailVerificationToken emailVerificationToken = verificationTokenService.verifyToken(token);
+        RegistrationVerification registrationVerification = verificationTokenService.verifyToken(token);
 
         User newUser = User.builder()
-                .email(emailVerificationToken.getUserEmail())
-                .password(emailVerificationToken.getUserPassword())
+                .email(registrationVerification.getUserEmail())
+                .password(registrationVerification.getUserPassword())
                 .roles(Set.of(Role.USER))
                 .provider(AuthProvider.LOCALE)
                 .build();
 
         User savedUser = userRepository.save(newUser);
-        log.info("[REGISTER] Registrazione eseguita con successo per {}", newUser.getEmail());
 
+        log.info("[REGISTER] Registrazione eseguita con successo per {}", newUser.getEmail());
         return authMapper.registerResponseDto(savedUser);
     }
 
@@ -123,19 +124,10 @@ public class AuthService {
      */
     @AuditAction(action = "LOGIN_USER", logFinalResault = true)
     @Transactional
-    public LoginResponseDto login(@Valid AccessRequestDto request, HttpServletRequest servletRequest) {
+    public LoginResponseDto login(@Valid AuthRequestDto request, HttpServletRequest servletRequest) {
 
-        String userIp = servletRequest.getRemoteAddr();
-        String userAgent = servletRequest.getHeader("User-agent");
-
-        // History del login
-        LoginHistoryDto loginHistoryDto = LoginHistoryDto.builder()
-                .ipAddress(userIp)
-                .userEmail(request.getEmail())
-                .userAgent(userAgent)
-                .loginTime(LocalDateTime.now())
-                .loginProvider(AuthProvider.LOCALE)
-                .build();
+        // Creo history del login
+        LoginHistoryDto loginHistoryDto = loginHistoryService.create(servletRequest, request.getEmail(), AuthProvider.LOCALE);
 
         // Autenticazione utente
         Authentication auth = userAuth(request, loginHistoryDto);
@@ -163,7 +155,7 @@ public class AuthService {
     }
 
 
-    private Authentication userAuth(AccessRequestDto request, LoginHistoryDto loginHistoryDto){
+    private Authentication userAuth(AuthRequestDto request, LoginHistoryDto loginHistoryDto){
         Authentication auth;
         try {
             auth = authenticationManager.authenticate(

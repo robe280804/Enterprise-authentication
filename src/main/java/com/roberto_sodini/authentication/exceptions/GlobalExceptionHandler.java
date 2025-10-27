@@ -14,6 +14,11 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Object> illegalStateException(IllegalStateException ex, WebRequest request){
+        return generateResponse("ILLEGAL_STATE", HttpStatus.INTERNAL_SERVER_ERROR, ex, request);
+    }
+
     @ExceptionHandler(PasswordInvalid.class)
      public ResponseEntity<Object> passwordInvalid(PasswordInvalid ex, WebRequest request){
         return generateResponse("PASSWORD_NOT_EQUALS", HttpStatus.CONFLICT, ex, request);
