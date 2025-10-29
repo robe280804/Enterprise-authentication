@@ -7,22 +7,12 @@
     <list default="true" id="6fb695be-1c07-4fe8-88ec-b6a62494b77a" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/controller/AuthController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/controller/ResetPasswordController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/controller/ResetPasswordController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/controller/UserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/dto/AccessRequestDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/dto/AuthRequestDto.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/dto/ResetPasswordDto.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/dto/ResetPasswordRequestDto.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/exceptions/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/exceptions/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/mapper/AuthMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/mapper/AuthMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/model/EmailVerificationToken.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/model/RegistrationVerification.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/repository/EmailVerificationTokenRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/repository/RegistrationVerificationRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/repository/RegistrationVerificationRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/repository/RegistrationVerificationRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/repository/ResetPasswordRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/repository/ResetPasswordRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/repository/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/AuthService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/EmailVerificationTokenService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/RegistrationVerificationService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/LoginHistoryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/LoginHistoryService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/RefreshTokenService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/RefreshTokenService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/ResetPasswordService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/roberto_sodini/authentication/service/ResetPasswordService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,6 +27,7 @@
         <option value="HTML File" />
         <option value="Exception" />
         <option value="Class" />
+        <option value="Dockerfile" />
       </list>
     </option>
   </component>
@@ -58,17 +49,20 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Application.Unnamed.executor&quot;: &quot;Run&quot;,
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/UTENTE/Desktop/authentication/src/main/resources&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Application.Unnamed.executor": "Run",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/UTENTE/Desktop/authentication/src/main/resources",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="com.roberto_sodini.authentication.security.jwt" />

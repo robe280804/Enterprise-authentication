@@ -26,8 +26,8 @@ public interface RegistrationVerificationRepository extends JpaRepository<Regist
 
     @Modifying
     @Query("UPDATE RegistrationVerification rv " +
-            "SET rv.revoked = true," +
-            "rv.registerSuccess = true" +
+            "SET rv.revoked = true, " +
+            "rv.registerSuccess = true " +
             "WHERE rv.id = :id")
     int revokedAndConfirmToken(@Param("id") Long id);
 }

@@ -1,5 +1,6 @@
 package com.roberto_sodini.authentication.exceptions;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -54,6 +55,10 @@ public class GlobalExceptionHandler {
         return generateResponse("RATELIMIT_EXCEED", HttpStatus.TOO_MANY_REQUESTS, ex, request);
     }
 
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<Object> entityNotFound(EntityNotFoundException ex, WebRequest request){
+        return generateResponse("ENTITY_NOT_FOUND", HttpStatus.NOT_FOUND, ex, request);
+    }
 
     private static ResponseEntity<Object> generateResponse(
             String error, HttpStatus status, Exception ex, WebRequest request

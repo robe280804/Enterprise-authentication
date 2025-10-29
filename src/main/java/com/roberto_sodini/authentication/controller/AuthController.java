@@ -5,6 +5,7 @@ import com.roberto_sodini.authentication.dto.LoginResponseDto;
 import com.roberto_sodini.authentication.dto.RegisterResponseDto;
 import com.roberto_sodini.authentication.security.ratelimiter.RateLimit;
 import com.roberto_sodini.authentication.service.AuthService;
+import com.roberto_sodini.authentication.service.RefreshTokenService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

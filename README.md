@@ -135,3 +135,14 @@ CAPTCHA / reCAPTCHA (step up dopo N tentativi o sempre su registrazione)
 ## Utilità
 - Lombok 
 - Apache Commons Codec – Utilità per codifica e hashing di dati.
+
+# Avvio
+
+## Prerequisiti
+- Docker e docker-compose
+- Java 21
+- Maven
+
+## Comandi
+- docker compose up -d
+- In intellij, impostare come variabili d'ambiente il file .env

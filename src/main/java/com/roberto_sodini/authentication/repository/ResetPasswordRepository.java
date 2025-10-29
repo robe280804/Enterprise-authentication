@@ -29,7 +29,7 @@ public interface ResetPasswordRepository extends JpaRepository<ResetPassword, Lo
 
     @Modifying
     @Query("UPDATE ResetPassword rv " +
-            "SET rv.revoked = true," +
+            "SET rv.revoked = true " +
             "WHERE rv.id = :id")
     int revokedAndConfirmToken(@Param("id") Long id);
 
