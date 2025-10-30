@@ -17,8 +17,8 @@ spring:
     enabled: true
 
   datasource:
-    url: jdbc:mysql://db:3307/${DB_NAME}?createDatabaseIfNotExist=true
-    username: ${DOCKER_DB_USERNAME}
+    url: jdbc:mysql://localhost:3306/${DB_NAME}?createDatabaseIfNotExist=true
+    username: ${DB_USER}
     password: ${DB_PASS}
 
   jpa:
@@ -43,7 +43,7 @@ spring:
             enable: true
 
   redis:
-    host: redis
+    host: localhost
     port: 6379
     timeout: 2000ms
     connect-timeout: 2000ms
@@ -56,7 +56,7 @@ spring:
       shutdown-timeout: 200ms
 
   kafka:
-    bootstrap-servers: "kafka:9092"
+    bootstrap-servers: "localhost:9092"
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
